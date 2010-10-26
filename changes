@@ -1,0 +1,48 @@
+04/29 03 Eudora2Mbox.py
+	Improved attachment code so that if the attachment appeared
+	neither to be a Mac path or a DOS path, it prints and saves
+	an error message.
+
+	Eudora2Mbox.py
+	Made to replace slash characters in descmap.pce file with 
+	Unix-friendly underscore.
+
+	index.html
+	Made clearer who the maintainer is, and what the purpose of
+	the SourceForge site is.
+
+03/06 02 *.py
+	Made to abort if Python version is less than 2.2.1.
+	Started a separate branch that is back-ported to 1.5.2.
+	Reason is that the back-port makes a lot of the code much
+	uglier than the 2.2.1 version.
+
+	*.html
+	Reflected these changes, tidied up, and inserted a section
+	in details.html about how incoming and outgoing messages ought
+	to be handled.
+
+12/12 02 Eudora2Mbox.py
+	Made to reconstruct header Date: with comma after weekday
+	see RFC 2822 3.3 (Balsa chokes on this)
+	Fixes all Eudora message dates (but not non-Eudora messages)
+
+	Was stripping whitespace off beginnings of all lines,
+	including 'wrapped' header lines.  Fixed this.
+
+	Made to correctly run stand-alone.
+
+	Made to process all messages rather than just Eudora messages,
+	so that header formatting can be standardized, and
+	TOC and In-Reply-To info can be handled.
+
+03/06 02 *.py
+	Made to abort if Python version is less than 2.2.1.
+	Started a separate branch that is back-ported to 1.5.2.
+	Reason is that the back-port makes a lot of the code much
+	uglier than the 2.2.1 version.
+
+	*.html
+	Reflected these changes, tidied up, and inserted a section
+	in details.html about how incoming and outgoing messages ought
+	to be handled.

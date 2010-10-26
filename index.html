@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
+<link rev="MADE" href="mailto:e.maryniak@pobox.com" />
+<title>Eudora2Unix</title>
+<style type="text/css">
+	<!--
+	body { color: black; background-color: white; }
+	kbd { font-family: sans-serif; font-style: normal; }
+	h2 { font-size: medium; font-weight: bold; font-style: normal; }
+	em.underline { font-weight: medium; font-style: normal; text-decoration: underline; }
+	code { color: navy; }
+	kbd { color: purple; }
+	-->
+</style>
+</head>
+
+<body>
+
+<h1>Eudora2Unix</h1>
+<hr />
+<p>
+<a href="http://eudora2unix.sourceforge.net"><img src="Eudora2Unix.png" alt="Eudora2Unix Home Page" width="248" height="69" /></a>
+<a href="http://sourceforge.net"> <img src="http://sourceforge.net/sflogo.php?group_id=68238&amp;type=5" width="210" height="62" alt="SourceForge Logo" /></a>
+</p><p>
+Welcome to the Eudora to Unix (Eudora2Unix) page!
+</p>
+<h2>Description</h2>
+<p>
+Eudora2Unix is a collection of Python scripts that together convert
+<a href="http://www.eudora.com">Qualcomm Eudora</a> mail folders
+to mail directories for unix or Linux.
+The mail clients <a href="http://www.washington.edu/pine/">Pine</a> and
+<a href="http://kmail.kde.org">KMail</a> are explicitly supported.  I have
+also tried the output with <a href="http://balsa.gnome.org">Balsa</a>, which
+uses a mailbox structure similar to Pine's.
+</p>
+<p>
+Beyond doctoring the Eudora mail messages to be in mbox format, Eudora2Unix
+preserves information that Eudora does not store in the mailbox files. 
+This information includes status info (whether a message has been read or not),
+message priority, and attachments.  For the Windows 3.x versions, it uses other
+auxiliary files to correctly rename folders and files from their 8-character
+DOS names to the names that appear in Eudora.
+</p>
+<p>
+These scripts are placed under the
+<a href="http://www.gnu.org/licenses/gpl.html">GNU General Public License</a>
+and are free software, both as in freedom and as in beer.<br />
+This software is also listed at
+<a href="http://freshmeat.net/projects/eudora2unix/">Freshmeat</a>.
+</p>
+<p>
+<big><strong><a href="details.html">Details about Eudora2Unix</a></strong></big>.
+</p>
+<p>
+<big><strong><a href="http://sourceforge.net/projects/eudora2unix/">SourceForge Project Page</a></strong></big>
+(bug reports, older versions, more details, etc)
+</p>
+
+<h2>Download</h2>
+<p>
+The current version requires Python 2.2.1: 
+<kbd><a href="http://prdownloads.sourceforge.net/eudora2unix/eudora2unix-1.3.tar.gz?download">eudora2unix-1.3.tar.gz</a></kbd>
+</p>
+<p>
+For older versions of Python (back to 1.5.2), use this separate branch
+<kbd><a href="http://prdownloads.sourceforge.net/eudora2unix/eudora2unix-backport-1.1.tar.gz?download">eudora2unix-backport-1.1.tar.gz</a></kbd>
+</p>
+
+<h2>The scripts</h2>
+<ul>
+<li><p><kbd>Eudora2Unix.py</kbd> - Eudora mail folder tree walker</p>
+	<p>
+	Main script that loops over the Eudora folders and calls the next
+	script, <kbd>Eudora2Mbox.py</kbd>, for each mailbox therein.
+	It then arranges mail folders in the fashion either Pine or KMail
+	expects.
+	</p>
+</li><li><p><kbd>Eudora2Mbox.py</kbd> - Eudora to unix mailbox converter</p>
+	<p>
+	Converts a Eudora mailbox to unix 'mbox' format,
+	fixing some header fields to allow for Eudora's idiosyncracies, as
+	well as those of Kmail and Pine.
+	You can also run the script directly on an individual mailbox or put
+	it in your own script that traverses the Eudora mail folder tree.
+	</p>
+</li><li><p><kbd>EudoraTOC.py</kbd> - Eudora toc file parser</p>
+	<p>
+	Makes an educated guess as to the format of the proprietary Eudora
+	'<kbd>.toc</kbd>' files, prints out useful info as a text file. 
+	This format is known to vary substantially between versions
+	of Eudora, and drastically between the Mac and Windows versions, so
+	it is likely not to work for untested Eudora versions.
+	</p>
+</li></ul>
+
+<h2>Installation, configuration and usage</h2>
+
+<ul>
+<li>
+	<p>
+	Put the scripts, in a directory in your <kbd>$PATH</kbd>.
+	</p>
+</li>
+<li>
+	<p>
+	Make the scripts executable:
+	</p>
+	<p>
+	<kbd>chmod a+x /path/to/Eudora*.py</kbd>
+	</p>
+</li>
+<li>
+	<p>
+	Copy your Eudora directory to your Linux home directory, e.g.:
+	</p>
+	<p>
+	(If you are using a Mac version that does not use '<kbd>.toc</kbd>'
+	files, you will first have to get a converter from the Eudora site, and
+	use it to convert your mailboxes.)
+	</p>
+	<p>
+	Make sure to transfer the files as binary.
+	</p>
+</li>
+<li>
+	<p>
+	You may wish to copy your attachments too.  By default, this folder
+	is in the Eudora mail folder, and named '<kbd>Attachments Folder</kbd>',
+	'<kbd>attach</kbd>', or '<kbd>Attach</kbd>', depending on your Eudora
+	version.  You should rename it so as to have no spaces in the file path,
+	and make it a subfolder of the Eudora mail directory.
+	I like to hide it from the mail client by putting a dot at the
+	beginning of the filename.
+	</p>
+	<p>
+	To identify the attachments forlder to  Eudora2Unix, use the option
+	</p>
+	<p>
+	<kbd>-a attachments_folder 
+	</kbd>
+	</p>
+</li>
+<li>
+	<p>
+	Convert the entire <kbd>~/eudora_folder</kbd> directory to unix
+	<kbd>~/Mail.e2u</kbd>, suitable for KMail, with:
+	</p>
+	<p>
+	<kbd>Eudora2Unix.py -t kmail eudora_folder 
+	</kbd>
+	</p>
+</li>
+<li>
+	<p>
+	Alternatively, try it out on a single mailbox file first:
+	</p>
+	<p>
+	<kbd> mkdir ~/tmp; cd ~/tmp <br />
+	cp -pv ~/eudora_folder/in.mbx in.mbx <br />
+	Eudora2Mbox.py in.mbx
+	</kbd>
+	</p>
+</li>
+<li>
+	<p>
+	Follow the instructions given by <kbd>Eudora2Unix.py </kbd> and so,
+	remove the Eudora2Unix auxiliary files (<kbd>*.E2U_*</kbd>), and
+	the various Windows auxiliary files!
+	</p>
+</li>
+<li>
+	<p>
+	Once you are satisfied with the results, 
+	either rename the converted directory to be your mail client directory,
+	or move parts of it over to an existing mail client directory (see
+	the following tip.)
+	</p>
+</li>
+<li>
+	<p>
+	Tip on merging old Kmail <kbd>$HOME/Mail</kbd> mailboxes.
+	</p>
+	<p>
+	If you have a previous <kbd>~/Mail</kbd> directory (with mbox files),
+	you can rename this directory (e.g. to <kbd>Mail.old</kbd>), then run 
+	<kbd>Eudora2Unix.py</kbd> and finally simply copy
+	<kbd>~/Mail.old/somembx</kbd> to <kbd>~/Mail/somembx.prev</kbd>.
+	</p>
+	<p>
+	In KMail move the mail from the <kbd>somembx.prev</kbd> folder
+	(which will pop up in KMail's left folder pane) to an appropiate
+	location or rename the folder, etc.
+	</p>
+</li>
+<li>
+	Start up your mail client (pine or Kmail) and see your converted mail!
+</li>
+</ul>
+
+
+<h2>Links</h2>
+
+<p>
+Eudora2Unix was originally written by Eric Maryniak.
+<a href="http://pobox.com/%7Ee.maryniak/index.html"><img src="home.png" alt=" " width="61" height="62"/>
+There's no page like Eric's home page</a>.
+</p>
+<p>
+Eudora2Unix is now maintained by Steve White:
+(<a href="mailto:Stevan White &lt;Stevan_White@hotmail.com&gt;">Stevan_White@hotmail.com</a>).
+</p>
+
+<hr />
+<p>
+Page last modified on
+2003-4-29
+</p>
+
+</body>
+</html>

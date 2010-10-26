@@ -1,0 +1,433 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
+<link rev="MADE" href="mailto:Stevan_White@hotmail.com" />
+<title>Eudora2Unix Details</title>
+<style type="text/css">
+<!--
+	body { color: black; background-color: white; }
+	kbd { font-family: sans-serif; font-style: normal; }
+	h2 { font-size: medium; font-weight: bold; font-style: normal; }
+	em.underline { font-weight: medium; font-style: normal; text-decoration: underline; }
+	code { color: navy; }
+	kbd { color: #004400; }
+	#special-mbx th { border-top: thin black solid;
+		border-bottom: thin black solid; }
+	table { margin-left: 1cm; margin-right: 1cm; }
+	code.indent { padding-left: 1cm; }
+-->
+</style>
+</head>
+<body>
+
+<h1>Eudora2Unix Details</h1>
+<hr />
+<ul>
+<li>
+	Converts Eudora mailbox files to mbox format
+</li>
+<li>
+	Can use Eudora '<kbd>.toc</kbd>' files to preserve info of whether a
+	message was read or not, and the message priority.
+</li>
+<li>
+	Marks a file as "Answered" for Pine if it find another message
+	that refers to it.
+</li>
+<li>
+	For Windows directories, can use '<kbd>dscmap.pce</kbd>' files to
+	restore folder and file names.
+</li>
+<li>
+	Converts Eudora directory structure to either Pine or Kmail format
+</li>
+</ul>
+
+<h2>
+Tested on
+</h2>
+<ul>
+<li>
+	Eudora v 5 Windows
+</li>
+<li>
+	Eudora Lite v 3.1.3 Mac
+</li>
+<li>
+	Eudora Lite v 1.3.1 Mac
+</li>
+<li>
+	Eudora Lite v 3.0.6 Windows
+</li>
+<li>
+	Eudora Lite v 1.5.4 Windows
+</li>
+</ul>
+
+<h2>
+Mailbox format
+</h2>
+<p>
+The Eudora mailbox format is very nearly unix mbox format, the main
+difference being that the initial line of a message, the one
+that begins with the word '<code>From </code>' with no colon, has the string
+'<code>???@???</code>' in place of the sender's e-mail.  By extracting the
+sender's e-mail from other message headers and using this to repair the
+'<code>From </code>' line, Eudora mailboxes are made usable by many unix
+mail clients.
+</p>
+
+<p>
+The <code>Date</code> header is often left off of Eudora messages,
+presumably because it is contained in the initial '<code>From </code>' line. 
+That date isn't in quite the format required by mbox format, so it must be
+massaged a little. 
+</p>
+<p>
+Furthermore, the exact format of the date header specified in
+<a href="http://www.faqs.org/rfcs/rfc2822.html">RFC 2822</a>
+is not always achieved by old email.  Often, the comma required after the
+weekday is left off; this will choke some finicky clients.  This is also
+repaired.
+</p>
+
+<h2>
+Status and priority
+</h2>
+<p>
+Most clients have a mechanism for indicating
+</p>
+<ul>
+<li>
+	Whether or not a message has been read
+</li>
+<li>
+	Whether or not a message has been downloaded
+</li>
+<li>
+	A level of priority of a message
+</li>
+<li>
+	Whether a message was answered, re-directed, or forwarded
+</li>
+</ul>
+<p>
+This info isn't very well standardized.  
+</p>
+
+<p>
+Most versions of Eudora for Windows and Mac keep this info for each
+mailbox in a separate binary file with the suffix '<kbd>.toc</kbd>'. 
+The exact format of this file varies between versions and is the subject
+of some debate.  Furthermore, some Mac versions of Eudora store the info
+in the Mac "resorce fork" of the mailbox file.  Fortunately, Qualcomm
+has provided utilities for converting such mailboxes to the two-file
+version.  Get it here:
+<a href="ftp://ftp.eudora.com/eudora/eudoralight/mac/extras/utils/TOCConvert.sea.hqx">TOCConvert</a>
+</p>
+
+<dl>
+<dt>
+Read
+</dt>
+<dd>
+	<p>
+	This is indicated for most unix clients by an <code>R</code>
+	in the <code>Status</code> header.
+	</p>
+</dd>
+<dt>
+Downloaded
+</dt>
+<dd>
+	<p>
+	This is indicated for most unix clients by an <code>O</code>
+	in the <code>Status</code> header.
+	</p>
+</dd>
+<dt>
+Priority
+</dt>
+<dd>
+	<p>
+	Eudora uses numbers from 1-5 (Highest to Lowest). 
+	Kmail responds to a mail header <code>X-Priority</code> with
+	these same numbers, but for itself, uses the
+	<code>Priority</code> header, which only takes one value,
+	<code>urgent</code>.
+	</p>
+	<p>
+	Pine will "flag" a message with <code>F</code> in the
+	<code>X-Status</code> header.
+	</p>
+</dd>
+
+<dt>
+Answered
+</dt>
+<dd>
+	<p>
+	The conventional means of indicating that one message is a response
+	to another is an <code>In-Reply-To</code> header corresponding
+	to the <code>Message-ID</code> header of the other.  
+	</p>
+	<p>
+	To use this to determine if a message has been answered, the whole
+	mailbox must be read in advance.  Furthermore, this method only 
+	works if the responses are in the same mailbox as the original.
+	</p>
+	<p>
+	Later versions of Eudora use this determination when they first
+	build the <kbd>.toc</kbd> file for an existing mailbox.
+	</p>
+	<p>
+	Eudora Lite versions 1.x seem not to use or set the
+	<code>In-Reply-To</code> header.
+	</p>
+	<p>
+	Kmail seems to make the determination on the fly, and displays 
+	responses to messages in a heirarchical fashion.
+	</p>
+	<p>
+	Pine is dumb this way, however, and only indicates the message was
+	answered if the header <code>X-Status</code> has the value
+	<code>A</code>.
+	</p>
+</dd>
+<dt>
+Re-directed, Forwarded
+</dt>
+<dd>
+	<p>
+	Eudora records and distinguishes between "answered", "forwarded",
+	"redirected" messages.  Pine and Kmail only know a message was
+	answered.
+	</p>
+	<p>
+	I don't see that Pine or Kmail use this information.
+	</p>
+</dd>
+<dt>
+Incoming, Outgoing
+</dt>
+<dd>
+	<p>
+	These scripts don't address the issue of whether a message is 
+	sent by the user or received...it isn't appropriate for them to
+	do so.
+	</p>
+	<p>
+	The only way Pine knows whether a message was incoming or outgoing,
+	especially with old e-mail that was sent from a different e-mail
+	address, is by knowing the user's old e-mail addresses.
+	</p>
+	<p>
+	This makes sense conceptually.  If you're holding a paper missive
+	in your hand, and don't remember how it got there, how do you know
+	it was outgoing or incoming?  Why, you compare it's addressee to
+	your own name (and aliases).
+	</p>
+	<p>
+	To inform Pine of your old e-mail addresses, put them in the list
+	<kbd>alt-addresses</kbd> in <kbd>Setup-&gt;Config</kbd>.  Then it
+	will display outgoing messages as<br>
+		<code>To: &lt;recipient&gt;</code>
+
+	</p>
+</dd>
+</dl>
+
+<h2>
+Special mailboxes
+</h2>
+
+<p>
+Most clients have special mailboxes for incoming, outgoing, and trash,
+and maybe draft messages.  Eudora2Unix does its best to account for those
+of Eudora, Pine, and Kmail, according to this table:
+</p>
+<table id="special-mbx" cellspacing="10">
+<tr>
+<th>Eudora *</th>	<th>Pine</th>	<th>KMail</th>
+</tr>
+<tr>
+<td><kbd>In.mbx</kbd></td>	<td><kbd>saved-messages</kbd> **</td>	<td><kbd>inbox</kbd></td>
+</tr>
+<tr>
+<td><kbd>Out.mbx</kbd></td>	<td><kbd>sent-mail</kbd></td>	<td><kbd>sent-mail</kbd></td>
+</tr>
+<tr>
+<td><kbd>Trash.mbx</kbd></td>	<td>***</td>	<td><kbd>trash</kbd></td>
+</tr>
+<tr>
+<td>n/a</td>	<td><kbd>postponed-msgs</kbd></td>	<td><kbd>outbox</kbd> (touched)</td>
+</tr>
+<tr>
+<td>n/a</td>	<td></td>	<td><kbd>drafts</kbd> (skipped)</td>
+</tr>
+</table>
+
+<table>
+<tr><td>
+*   </td><td>Eudora for the Mac lacks the <kbd>.mbx</kbd> suffix
+</td></tr>
+<tr><td>
+**  </td><td>When used as a POP client, Pine's INBOX is on the server; not a
+real file; downloaded messages are in saved-messages
+</td></tr>
+<tr><td>
+*** </td><td>Pine doesn't have a trash mailbox--just marks messages for
+deletion.
+</td></tr>
+</table>
+
+<h2>
+Attachments
+</h2>
+
+<p>
+Eudora extracts all attachments, converts them, and saves them in a 
+user-configurable directory.  In the place of the encoded binary,
+it places a line like<br />
+<code class="indent">Attachment converted: filepath</code><br />
+in the message body.
+</p>
+
+<p>
+This isn't very useful on the unix side.  Besides ignoring the issue,
+there are two alternatives: either re-encode the binaries, and replace
+them in their corresponding messages according to RFC 2045, or somehow
+replace the Eudora filepath indicator with something more useful on
+the unix side.
+</p>
+
+<p>
+The latter is certainly easier, and it's what I've done.  Eudora2Unix
+creates a URI to a file<br />
+<code class="indent">file://$HOME/maildir/attach/binary</code><br />
+Where attach is the argument of the <code>-a</code> flag passed to
+Eudora2Unix,
+and should correspond to the name of the Eudora attachments folder.
+Note this folder should be re-named to have no spaces.  For Mac
+mail directories, Eudora2Unix also avoids processing this folder as
+a mail folder (since Mac mailbox names have no extensions, there's no
+other way for Eudora2Unix to distinguish between mailboxes and other
+binaries).
+</p>
+
+<p>
+It makes the attachment 'clickable' only in Pine, and only if the
+file path contains no spaces.  I have contacted both the Pine and
+Kmail developers about this issue.  There is no reason why this
+method should not work well.
+</p>
+
+<p>
+Note that it makes some sense for this directory to be invisible
+to Pine, so a name like '<kbd>.attachments</kbd>' is good.
+</p>
+
+<h2>
+Directory structure
+</h2>
+
+<p>
+The Eudora Mac mail directory structure is straightforward: the
+mailbox display reflects the filesystem structure.
+The Windows versions distinguish mail folders with a '<kbd>.fol</kbd>'
+suffix and mailbox files with a '<kbd>.mbx</kbd>'suffix.  These
+suffixes aren't displayed by the program.  Furthermore, the
+Windows 3.x versions must use 8-character DOS file names, but display
+nice long folder names.  This is accomplished by means of a small
+table named '<kbd>dscmap.pce</kbd>' in each directory that contains
+mailboxes.
+</p>
+
+<p>
+Pine's directory structure is also straightforward.  It starts in
+the directory <kbd>$HOME/mail</kbd> by default. Note that a 
+directory can be hidden from folder display by putting a '<kbd>.</kbd>'
+in front of its name.
+</p>
+
+<p>
+Kmail's directory structure is unjustifiably complicated.  The folder
+names it displays correspond to directories, which must include
+subdirectories '<kbd>cur</kbd>' '<kbd>new</kbd>' and '<kbd>tmp</kbd>',
+but which <em>do not</em> contain mailboxes! 
+The actual content of the folder is in an <em>invisible</em> folder named
+'<kbd>.foldername.directory</kbd>'.  Good grief.
+</p>
+
+<h2>
+Example
+</h2>
+<p>
+Copy Eudora directory to unix directory <kbd>eudora-mail-directory</kbd>,
+rename the Eudora Attachments folder as '<kbd>.attachments</kbd>',
+</p>
+
+<p>
+<code class="indent">Eudora2Unix.py -t kmail -a '.attachments' eudora-mail-directory</code>
+</p>
+
+<p>
+This will finally produce a directory '<kbd>Mail.e2u</kbd>'.  Once
+your are happy with it, and you're sure it won't wipe out anything
+important, its contents should be moved to the '<kbd>Mail</kbd>'
+directory.  Then Kmail will be able to see the results.
+</p>
+
+<h2>
+To Do
+</h2>
+<dl>
+<dt>
+Attachments
+</dt>
+<dd>
+	Re-encode and insert into mbox?
+	Just get Pine and Kmail to view file URI's properly?
+</dd>
+<dt>
+Other unix clients
+</dt>
+<dd>
+	I see the purpose of this software as being to get Eudora
+	mail over to unix, not in being a generic unix mail converter.
+	It does Pine because I like Pine and Pine mailboxes are very
+	like Eudora's; it does Kmail because it was originally written
+	to do Kmail and Kmail is very popular.
+	However, if another client could be supported by making a
+	simple alteration, I wouldn't object.
+</dd>
+<dt>
+Technical
+</dt>
+<dd>
+	Re-write EudoraTOC to make use of Python's built-in endian
+	struct unpackers.
+</dd>
+</dl>
+
+<h2>
+Further documentation
+</h2>
+<p>
+The scripts are also documented internally.  User-level documentation
+can be viewed with the Python script '<kbd>pydoc.py</kbd>', which comes
+with recent Python distributions.
+</p>
+
+<hr />
+<address>
+Permanent URL: <kbd><a href="http://sourceforge.net/projects/eudora2unix/">http://sourceforge.net/projects/eudora2unix/</a></kbd><br />
+Page last modified on
+2002-12-09,
+by Stevan White
+(<a href="mailto:Stevan White &lt;Stevan_White@hotmail.com&gt;">Stevan_White@hotmail.com</a>).
+</address>
+
+</body>
+</html>
