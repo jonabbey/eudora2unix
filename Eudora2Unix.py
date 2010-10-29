@@ -74,6 +74,9 @@ def cannot_copy_complaint( f, dst, strerror ):
 def copying_directory_message( src, dest ):
 	return 'Copying directory ' + src + ' to ' + dest
 
+def finished_copying_directory_message( src, dest ):
+	return 'Finished copying directory ' + src + ' to ' + dest
+
 def user_specific_script_message( user_pre_script ):
 	return [
 	'Pre-actions with script', 
@@ -306,6 +309,9 @@ def convert_directory( eudoradir, opts ):
 
 	inform( copying_directory_message( eudoradir, maildir ) )
 	shutil.copytree( eudoradir, maildir )
+	inform( finished_copying_directory_message( eudoradir, maildir ) )
+
+	# runs ~/bin/eudora2unix-file-renames.sh
 
 	execute_user_pre_script( 'bin/eudora2unix-file-renames.sh', maildir )
 
