@@ -1,4 +1,3 @@
-import common
 
 # Verbosity.
 # Determines if subroutines {log,warn,err}_msg send output to stdout, too:

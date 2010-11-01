@@ -1,5 +1,3 @@
-log = None
-
 def fatal( msg ):
 	if msg and len( msg ) > 0:
 		print >> sys.stderr, msg

@@ -3,7 +3,6 @@
 Classes for handling Eudora Mailbox header parsing and clean up.
 """
 
-import common
 
 date_pat = r'\s*\S+?\s*(\S{3})\s+(\S{3})\s+(\d{1,2})'
 time_pat = r'\s*(\d{2}:\d{2}:\d{2})\s+(\d{4})\s*([+-]\d{4}){0,1}'

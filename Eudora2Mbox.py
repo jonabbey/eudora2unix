@@ -62,7 +62,7 @@ from mailbox import mbox
 
 import Header
 import Message
-import common
+from common import fatal
 
 #
 # Copyright and Author:
