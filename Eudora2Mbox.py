@@ -64,6 +64,7 @@ from Header import Replies, TOC_Info, Header, strip_linesep, re_message_start
 import Header
 import Message
 from common import fatal
+import EudoraLog
 
 #
 # Copyright and Author:
@@ -111,9 +112,6 @@ P = sys.argv[0]
 
 exit_code = 0	# exit code: 0 if all ok, 1 if any warnings or errors
 
-line_no = 0	# line number of current line record (for messages)
-
-
 re_attachment = re.compile( '^Attachment converted: (.*?)$', re.IGNORECASE )
 
 def convert( mbx, opts = None ):
@@ -142,8 +140,6 @@ def convert( mbx, opts = None ):
 
 	print "Converting %s", (mbx)
 
-	global err, warn, log
-	global line_no
 	if not mbx:
 		fatal( P + ': usage: Eudora2Mbox.py eudora-mailbox-file.mbx' )
 		return 0
@@ -157,8 +153,8 @@ def convert( mbx, opts = None ):
 			elif f == '-t':
 				target = v
 
-	common.msg_no	= 0	# number of messages in this mailbox
-	common.line_no	= 0	# line number of current line record (for messages)
+	EudoraLog.msg_no	= 0	# number of messages in this mailbox
+	EudoraLog.line_no	= 0	# line number of current line record (for messages)
 
 	headers = None
 	last_file_position = 0
@@ -166,7 +162,7 @@ def convert( mbx, opts = None ):
 
 	re_initial_whitespace = re.compile( r'^[ \t]+(.*?)$' )
 
-	log = Log( mbx )
+	EudoraLog.log = EudoraLog.Log( mbx )
 
 	try:
 		INPUT = open( mbx, 'r' )
@@ -177,7 +173,6 @@ def convert( mbx, opts = None ):
 	toc_info = TOC_Info( mbx )
 	replies = Replies( INPUT )
 
-	#
 	# Main loop, that reads the mailbox file and converts.
 	#
 	# Sad issues with the nice python construct
@@ -190,9 +185,7 @@ def convert( mbx, opts = None ):
 		line = INPUT.readline()
 		if not line:
 			break
-		line_no += 1
-
-#		if line.find( 'From ', 0, headerblob_len ) == 0:
+		EudoraLog.line_no += 1
 
 		# find returns -1 (i.e., true) if it couldn't find
 		# 'Find ', so in fact this next if is looking to see
@@ -209,20 +202,15 @@ def convert( mbx, opts = None ):
 				# headers and start the message body.
 				# Finally, emit this as a message
 				#
-				log.error( 'Message start found inside message',
-					   common.msg_no, common.line_no )
+				EudoraLog.log.error( 'Message start found inside message',
+						     EudoraLog.msg_no, EudoraLog.line_no )
 				emit_headers( headers, toc_info,
-					      msg_offset, common.msg_no, replies, OUTPUT )
-			else:
-				#
-				# Bingo, we're in a message.
-				#
-				pass
+					      msg_offset, EudoraLog.msg_no, replies, OUTPUT )
 
 			msg_offset = last_file_position
 			headers = Header()
 			headers.add( 'From ', line[5:].strip() )
-			common.msg_no += 1
+			EudoraLog.msg_no += 1
 		else:
 			if headers:
 				if re_initial_whitespace.match( line ):
@@ -235,7 +223,7 @@ def convert( mbx, opts = None ):
 					# create the message
 
 					emit_headers( headers, toc_info,
-					msg_offset, common.msg_no, replies, OUTPUT )
+					msg_offset, EudoraLog.msg_no, replies, OUTPUT )
 					headers = None
 					# Blank line separates headers and body
 					# of message text
@@ -248,7 +236,7 @@ def convert( mbx, opts = None ):
 				if attachments_dir and re_attachment.search( line ):
 					handle_attachment( line, target, 
 							   attachments_dir, OUTPUT,
-							   common.msg_no, common.line_no )
+							   EudoraLog.msg_no, EudoraLog.line_no )
 				else:
 					# Message body, simply output the line.
 					# Since it's not stripped, don't add 
@@ -257,25 +245,25 @@ def convert( mbx, opts = None ):
 				last_file_position = INPUT.tell()
 
 	# Check if the file isn't empty and any messages have been processed.
-	if common.line_no == 0:
-		log.warn( 'empty file', common.msg_no, common.line_no )
-	elif common.msg_no == 0:
-		log.error( 'no messages (not a Eudora mailbox file?)',
-			   common.msg_no, common.line_no )
+	if EudoraLog.line_no == 0:
+		EudoraLog.log.warn( 'empty file', EudoraLog.msg_no, EudoraLog.line_no )
+	elif EudoraLog.msg_no == 0:
+		EudoraLog.log.error( 'no messages (not a Eudora mailbox file?)',
+				     EudoraLog.msg_no, EudoraLog.line_no )
 
 	# For debugging and comparison with a:
 	#
 	# 	'grep "^From ???@???" file.mbx | wc -l | awk '{ print $1 }'
 	#
-	#log_msg ("total number of message(s): $common.msg_no")
+	#log_msg ("total number of message(s): $EudoraLog.msg_no")
  
-	if common.msg_no == 0: msg_str = '          no messages' 
-	if common.msg_no == 1: msg_str = 'total:     1 message' 
-	if common.msg_no >= 1: msg_str = 'total: %(common.msg_no)5d messages' % vars()
+	if EudoraLog.msg_no == 0: msg_str = '          no messages' 
+	if EudoraLog.msg_no == 1: msg_str = 'total:     1 message' 
+	if EudoraLog.msg_no >= 1: msg_str = 'total: %(EudoraLog.msg_no)5d messages' % vars()
 
-	warn_err_str = warn.summary() + ', ' + log.summary()
+	warn_err_str = warn.summary() + ', ' + EudoraLog.log.summary()
 
-	if verbose >= 0:
+	if EudoraLog.verbose >= 0:
 		print '    ' + msg_str + '( ' + warn_err_str + ' )'
 
 	# Finish up. Close failures usually indicate filesystem full.
@@ -284,8 +272,6 @@ def convert( mbx, opts = None ):
 			INPUT.close()
 		except IOError:
 			return fatal( P + ': cannot close "' + mbx + '"' )
-
-	del log
 
 	return 0
 
@@ -334,7 +320,7 @@ def handle_attachment( line, target, attachments_dir, OUTPUT, msg_no, line_no ):
 	else:
 		print >> OUTPUT, "FAILED to convert attachment: \'" + attachment_desc + "\'"
 		warn.record( "FAILED to convert attachment: \'"
-				+ attachment_desc + "\'" , common.msg_no, common.line_no )
+				+ attachment_desc + "\'" , EudoraLog.msg_no, EudoraLog.line_no )
 	if len( name ) > 0:
 		file = os.path.join( target, attachments_dir, name )
 		if not os.path.isabs( target ):

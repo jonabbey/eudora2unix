@@ -3,6 +3,10 @@
 Classes for handling Eudora Mailbox header parsing and clean up.
 """
 
+import os
+import re
+import EudoraLog
+from EudoraLog import msg_no, line_no
 
 date_pat = r'\s*\S+?\s*(\S{3})\s+(\S{3})\s+(\d{1,2})'
 time_pat = r'\s*(\d{2}:\d{2}:\d{2})\s+(\d{4})\s*([+-]\d{4}){0,1}'
@@ -248,9 +252,9 @@ class Header:
             # make sense to be repeated
 
             if( id and not id.lower() in Header.ok_to_dup and self.getValue( id ) ):
-                common.log.warn( "extra '" + id +
-                                 "' header encountered - commented out ",
-                                 common.msg_no, common.line_no )
+                EudoraLog.log.warn( "extra '" + id +
+                                    "' header encountered - commented out ",
+                                    msg_no, line_no )
                 id = '>' + id
 
             self.add( id, value )
@@ -319,8 +323,8 @@ class Header:
 
                     if not date:
                             msg = "Bad date in From '" + hdr_line0 + "'"
-                            common.log.log( msg, common.msg_no, common.line_no )
-                            common.log.error( msg, common.msg_no, common.line_no )
+                            EudoraLog.log.log( msg, msg_no, line_no )
+                            EudoraLog.log.error( msg, msg_no, line_no )
                     else:
                             new_date = 'Date: ' + date.group(1) + ' ' \
                                     + date.group(3) + ' ' + date.group(2) + ' ' \
@@ -329,8 +333,8 @@ class Header:
                                     new_date += ' ' + date.group(6)
                     # This was 'warn', but it's by far the most common issue, and
                     # it's not abnormal for Eudora.
-                            common.log.log( 'No  Date field, added    [' + new_date + ']', \
-                                                common.msg_no, common.line_no )
+                            EudoraLog.log.log( 'No  Date field, added    [' + new_date + ']', \
+                                              msg_no, line_no )
                             self.add( 'Date:', new_date )
 
             hdr_date = self.getValue( 'Date:' )
@@ -377,11 +381,11 @@ class Header:
                             if not new_from:
                                     new_from = 'unknown@unknown.unknown'
                                     msg = 'No  From field, used   [' + new_from + ']'
-                                    common.log.record( msg, common.msg_no, common.line_no )
-                                    common.log.error( msg, common.msg_no, common.line_no )
+                                    EudoraLog.log.record( msg, msg_no, line_no )
+                                    EudoraLog.log.error( msg, msg_no, line_no )
                             else:
-                                    common.log.record( 'Had From field, used   [' \
-                                                           + new_from + ']', common.msg_no, common.line_no )
+                                    EudoraLog.log.record( 'Had From field, used   [' \
+                                                           + new_from + ']', msg_no, line_no )
 
                     # Extract an e-mail address from $new_from with a _greedy_
                     # match, if it matches on <...>, i.e. use the question mark (?)
@@ -407,8 +411,8 @@ class Header:
                                             email_address = new_from
 
                     email_address = email_address.strip()
-                    common.log.record( 'e-mail address extracted <' + email_address + '>',
-                                       common.msg_no, common.line_no )
+                    EudoraLog.log.record( 'e-mail address extracted <' + email_address + '>',
+                                          msg_no, line_no )
 
                     hdr_line0 = hdr_line0.replace( r'???@???', email_address, 1 )
 
@@ -462,7 +466,7 @@ class Header:
                                                     hpri = 'F'
                                             self.setValue( 'X-Status:', hpri )
                     else:
-                            common.log.warn( "No toc entry for message at offset "
-                                             + offset_str, common.msg_no, common.line_no )
+                            EudoraLog.log.warn( "No toc entry for message at offset "
+                                                + offset_str, msg_no, line_no )
 
             self.cleaned = True

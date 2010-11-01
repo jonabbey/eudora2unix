@@ -1,3 +1,4 @@
+import os
 
 # Verbosity.
 # Determines if subroutines {log,warn,err}_msg send output to stdout, too:
@@ -9,6 +10,10 @@
 #     verbose =  3  # logging, warnings and errors
 #
 verbose = 3
+
+log = None
+msg_no = 0
+line_no = 0
 
 LOG_SFX = '.E2U_LOG'
 ERR_SFX = '.E2U_ERR'
@@ -22,23 +27,21 @@ class Log:
 	recorded, and closes file."""
 
 	total_msgs = 0
-	exit_code
+	exit_code = 0
 
-	def __init__( self, mbx, suffix, verbosity ):
+	def __init__( self, mbx):
 		self.mbxname = mbx
-		self.kindstr = kindstr
-		self.verbosity_threshold = verbosity
 		self.log_msgs = 0
 		self.warn_msgs = 0
 		self.error_msgs = 0
 		
-	def record( self, msg, msg_no, line_no ):
+	def record( self, msg, verbosity ):
 		global P, verbose
 		msg += os.linesep
 		out = self.mbxname + ' (msg #' + `msg_no` + ', line #' \
-				+ `line_no` + '):' + os.linesep + msg
+		    + `line_no` + '):' + os.linesep + msg
 
-		if verbose >= self.verbosity_threshold:
+		if verbose >= verbosity:
 			print out
 
 		try:
@@ -64,16 +67,16 @@ class Log:
 		    self._summary(self.warn_msgs, 'warning') + os.linesep + \
 		    self._summary(self.error_msgs, 'error') + os.linesep
 
-	def log(self, msg, msg_no, line_no):
-		self.record(self.mbxname + LOG_SFX, msg, msg_no, line_no)
+	def log(self, msg):
+		self.record(self.mbxname + LOG_SFX, msg, 1)
 		self.log_msgs += 1
 
-	def warn(self, msg, msg_no, line_no):
-		self.record(self.mbxname + WARN_SFX, msg, msg_no, line_no)
+	def warn(self, msg):
+		self.record(self.mbxname + WARN_SFX, msg, 2)
 		self.warn_msgs += 1
 		Log.exit_code = 1
 
-	def error(self, msg, msg_no, line_no):
-		self.record(self.mbxname + ERR_SFX, msg, msg_no, line_no)
+	def error(self, msg):
+		self.record(self.mbxname + ERR_SFX, msg, 3)
 		self.error_msgs += 1
 		Log.exit_code = 1
