@@ -44,8 +44,8 @@ For more info on Pine's use of the 'X-Status:' header, look at its source, in
 the file 'mailindx.c', in format_index_line(idata).
 """
 __author__ = "Re-written in Python and extended by Stevan White <Stevan_White@hotmail.com>"
-__date__ = "2003-04-29"
-__version__ = "1.3"
+__date__ = "2010-11-01"
+__version__ = "2.0"
 __credits__ = """
 	Based on Eudora2Unix.pl by Eric Maryniak <e.maryniak@pobox.com>;
 	based in turn on eud2unx.pl by Blake Hannaford"""
