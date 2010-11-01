@@ -60,6 +60,7 @@ from email import message
 from email.mime.multipart import MIMEMultipart, MIMENonMultipart
 from mailbox import mbox
 
+from Header import Replies, TOC_Info, Header, strip_linesep, re_message_start
 import Header
 import Message
 from common import fatal

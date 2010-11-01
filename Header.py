@@ -9,6 +9,13 @@ time_pat = r'\s*(\d{2}:\d{2}:\d{2})\s+(\d{4})\s*([+-]\d{4}){0,1}'
 re_from_date_time = re.compile( date_pat + time_pat )
 re_message_start = re.compile( r'^From' + date_pat + time_pat )
 
+def strip_linesep( line ):
+    """Regular expressions proved too slow, and rstrip doesn't take
+    an argument in my distribution (?)"""
+    while len( line ) > 0 and ( line[-1] == '\n' or line[-1] == '\r' ):
+        line = line[0:-1]
+    return line
+
 # SW
 class Replies:
 	"""
@@ -218,13 +225,6 @@ class Header:
 			return val
 		else:
 			raise StopIteration
-
-        def strip_linesep( line ):
-            """Regular expressions proved too slow, and rstrip doesn't take
-            an argument in my distribution (?)"""
-            while len( line ) > 0 and ( line[-1] == '\n' or line[-1] == '\r' ):
-		line = line[0:-1]
-            return line
 
         def add_line(self, line):
             """Parses a header line into a (key, value) tuple, trimming
