@@ -90,6 +90,22 @@ import EudoraLog
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
+# ================================================================================
+#
+# Efficency
+# ---------
+# 
+# Appears that the bulk of the time is spent in I/O.  Shaved off
+# maybe 10% by reducing number of string copies, but to compare 
+# collect_replies and convert, seems the former takes just about half
+# what the latter takes, but the former does much less processing--
+# but it only reads, while the latter reads and writes.
+
+# (everything else too small to report)
+
+# Tried different matches for message start, including pre-compiled
+# regexp that should have just checked the first few chars, but it was
+# substantially slower than the string native find.
 
 if sys.hexversion < 33686000:
 	sys.stderr.write( "Aborted: Python version must be at least 2.2.1" \
@@ -342,33 +358,3 @@ if sys.argv[0].find( 'Eudora2Mbox.py' ) > -1:	# i.e. if script called directly
 		exit_code = 1
 	sys.exit( exit_code )
 
-# Efficency
-# ---------
-# 
-# Appears that the bulk of the time is spent in I/O.  Shaved off
-# maybe 10% by reducing number of string copies, but to compare 
-# collect_replies and convert, seems the former takes just about half
-# what the latter takes, but the former does much less processing--
-# but it only reads, while the latter reads and writes.
-
-# Profiler results on a very big mailbox
-#    total: 419 messages( total: 8 warnings, no errors )
-#         42523 function calls in 20.100 CPU seconds
-	
-#ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-# 10716    0.520    0.000    0.670    0.000 Eudora2Unix.py:224(add)
-#  9874    0.290    0.000    0.290    0.000 Eudora2Unix.py:235(getValue)
-#  9862    0.170    0.000    0.170    0.000 Eudora2Unix.py:241(setValue)
-#   419    0.120    0.000    0.120    0.000 Eudora2Unix.py:253(emit)
-#  9873    0.280    0.000    0.280    0.000 Eudora2Unix.py:262(Header:parse)
-#     1    5.690    5.690    5.690    5.690 Eudora2Unix.py:292(collect_replies)
-#     1    0.050    0.050    0.050    0.050 Eudora2Unix.py:336(collect_toc_info)
-#   419    0.220    0.001    0.480    0.001 Eudora2Unix.py:368(emit_headers)
-#     1   12.660   12.660   20.090   20.090 Eudora2Unix.py:566(convert)
-#     1    0.010    0.010   20.100   20.100 profile:0(convert( sys.argv[1] ))
-
-# (everything else too small to report)
-
-# Tried different matches for message start, including pre-compiled
-# regexp that should have just checked the first few chars, but it was
-# substantially slower than the string native find.
