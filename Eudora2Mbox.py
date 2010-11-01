@@ -57,12 +57,11 @@ import string
 import getopt
 import urllib
 from email import message
-from email.mime.multipart import MIMEMultipart, MIMENonMultipart
+from email.mime.multipart import MIMEMultipart
+from email.mime.nonmultipart import MIMENonMultipart
 from mailbox import mbox
 
 from Header import Replies, TOC_Info, Header, strip_linesep, re_message_start
-import Header
-import Message
 from common import fatal
 import EudoraLog
 
