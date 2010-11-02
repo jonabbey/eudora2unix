@@ -185,6 +185,14 @@ def convert( mbx, opts = None ):
 		INPUT = None
 		return fatal( P + ': cannot open "' + mbx + '", ' + strerror )
 
+	newfile = mbx + '.new'
+
+	try:
+		newmailbox = mbox( newfile )
+	except IOError, ( errno, strerror ):
+		mailbox = None
+		return fatal( P + ': cannot open "' + newfile + '", ' + strerror )
+
 	toc_info = TOC_Info( mbx )
 	replies = Replies( INPUT )
 
