@@ -14,11 +14,11 @@ re_from_date_time = re.compile( date_pat + time_pat )
 re_message_start = re.compile( r'^From' + date_pat + time_pat )
 
 def strip_linesep( line ):
-    """Regular expressions proved too slow, and rstrip doesn't take
-    an argument in my distribution (?)"""
-    while len( line ) > 0 and ( line[-1] == '\n' or line[-1] == '\r' ):
-        line = line[0:-1]
-    return line
+	"""Regular expressions proved too slow, and rstrip doesn't take
+        an argument in my distribution (?)"""
+        while len( line ) > 0 and ( line[-1] == '\n' or line[-1] == '\r' ):
+		line = line[0:-1]
+        return line
 
 # SW
 class Replies:
@@ -29,7 +29,7 @@ class Replies:
 
 	This reads through whole mailbox, makes dictionary of message ID's
 	found in In-Reply-To headers.
-
+        
 	Note: Won't work if reply is in a different mailbox, or otherwise lost.
 	"""
 	def __init__( self, file ):
