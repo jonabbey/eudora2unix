@@ -196,8 +196,8 @@ class Header:
 		idlen = len( id )
 		if idlen == 0:
 			return
-		lcid = id.lower()
 		if self.getValue( id ):
+			lcid = id.lower()
 			for h in self.data:
 				if h[0] == lcid:
 					h[2] = self.stripOffID( id, value )
