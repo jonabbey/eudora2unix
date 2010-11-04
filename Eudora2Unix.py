@@ -39,7 +39,7 @@ isMac = False;	# global for convert_files
 def usage_complaint( arg ):
 	return [
 	'Usage error; specify Eudora directory to be converted:',
-	'   ' + arg + ' eudora_directory [kmail|pine]'
+	'   ' + arg + ' [-a attachments directory] [-d target directory] eudora_directory [kmail|pine]'
 	]
 
 def target_directory_already_exists_complaint( maildir ):
