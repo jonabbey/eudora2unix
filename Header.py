@@ -5,8 +5,48 @@ Classes for handling Eudora Mailbox header parsing and clean up.
 
 import os
 import re
+import time
+import string
 import EudoraLog
-from EudoraLog import msg_no, line_no
+
+# Configuration.
+
+# Add a 'X-Eudora2Unix: <ISO 8601 date> converted' header at the end
+# of the emitted headers (see sub emit_headers),  0=no, 1=yes.
+# This can come in handy later to differentiate between 'new' KMail
+# messages and those inherited from the conversion.
+
+emit_X_Eudora2Unix_Header = 1
+
+# End of configuration.
+
+def iso_8601_zulu():
+	"""
+	Return a string with the date and time in ISO 8601 form for
+	'timezone' Zulu, ie. UTC +00:00, or zero-meridian and formerly
+	known as 'GMT', or 'Greenwich Mean Time'.
+
+	See http://www.cl.cam.ac.uk/~mgk25/iso-time.html for more info on
+	on the ISO International Standard Date and Time Notation (ISO 8601).
+
+	Example: for February 28, 2002 14:42:42 UTC+01:00, this string:
+	    2002-02-28T13:42:42Z
+	will be returned and shows the date and time in 'timezone' Zulu.
+
+	Note the one (1) hour difference in this particular example (because
+	it is in UTC +01:00), the 'T' separator between date and time and the
+	'Z' (Zulu) designator for the UTC +00:00 'timezone'.
+	CVS, a popular source code and document versioning program, also uses
+	Zulu time."""
+	(gm_year, gm_month, gm_day, 
+		gm_hour, gm_minute, gm_second, 
+		gm_weekday, gm_julian_day, gm_dstf) = time.gmtime()
+
+	iso_8601_zulu_datetime = "%04d-%02d-%02dT%02d:%02d:%02dZ" % \
+		(gm_year+1900, gm_month+1, gm_day, 
+		gm_hour, gm_minute, gm_second)
+
+	return iso_8601_zulu_datetime
 
 date_pat = r'\s*\S+?\s*(\S{3})\s+(\S{3})\s+(\d{1,2})'
 time_pat = r'\s*(\d{2}:\d{2}:\d{2})\s+(\d{4})\s*([+-]\d{4}){0,1}'
@@ -205,6 +245,18 @@ class Header:
 		else:
 			self.add( id, value )
 
+	def removeValue( self, id ):
+		newlist = []
+		lcid = id.lower()
+		for h in self.data:
+			if h[0] != lcid:
+				newlist.append(h)
+		self.data = newlist
+
+	def replaceValue( self, id, value ):
+		self.removeValue(id)
+		self.add(id, value)
+
 	def appendToLast( self, additional ):
 		"""Facilitates header field "folding" (RFC 2822 3.2.3)"""
 		# strangely, a raw tab after os.linesep doesn't get printed...
@@ -253,13 +305,12 @@ class Header:
 
             if( id and not id.lower() in Header.ok_to_dup and self.getValue( id ) ):
                 EudoraLog.log.warn( "extra '" + id +
-                                    "' header encountered - commented out ",
-                                    msg_no, line_no )
+                                    "' header encountered - commented out ")
                 id = '>' + id
 
             self.add( id, value )
 
-        def clean(toc, msg_offset, replies):
+        def clean(self, toc, msg_offset, replies):
             """
             Processes headers from a Eudora mbx message.  Data is taken
             from the Header object passed in as 'headers', the TOC_Info
@@ -296,13 +347,16 @@ class Header:
             also returned as the return value from this function.
             """
             if self.cleaned:
-                return
+		    print "Hey, already cleaned!"
+		    return
 
             re_between_angles = re.compile( '.*<(.*?)>.*' )
             re_before_parenth = re.compile( '(.*)\(.*?\)' )
             re_after_parenth = re.compile( '\(.*?\)(.*)' )
 
             hdr_line0 = self.getValue( 'From ' )	# still has line end
+
+	    print "Hey first hdr_line0 is: %s" % (hdr_line0,)
 
             # Handle "Date: " and "From: " fields specially.
             # Keep the first encountered non-empty value in $hdr_date and
@@ -323,8 +377,8 @@ class Header:
 
                     if not date:
                             msg = "Bad date in From '" + hdr_line0 + "'"
-                            EudoraLog.log.log( msg, msg_no, line_no )
-                            EudoraLog.log.error( msg, msg_no, line_no )
+                            EudoraLog.log.log( msg )
+                            EudoraLog.log.error( msg )
                     else:
                             new_date = 'Date: ' + date.group(1) + ' ' \
                                     + date.group(3) + ' ' + date.group(2) + ' ' \
@@ -333,8 +387,7 @@ class Header:
                                     new_date += ' ' + date.group(6)
                     # This was 'warn', but it's by far the most common issue, and
                     # it's not abnormal for Eudora.
-                            EudoraLog.log.log( 'No  Date field, added    [' + new_date + ']', \
-                                              msg_no, line_no )
+                            EudoraLog.log.log( 'No  Date field, added    [' + new_date + ']')
                             self.add( 'Date:', new_date )
 
             hdr_date = self.getValue( 'Date:' )
@@ -373,6 +426,7 @@ class Header:
             if not new_from:
                     new_from = commented_from
             if hdr_line0.find( '???@???' ) > -1:
+		    print "Hey found something: %s" % (hdr_line0,)
                     if not new_from:
                             if not new_from:
                                     new_from = self.getValue( 'Send:' )
@@ -381,11 +435,10 @@ class Header:
                             if not new_from:
                                     new_from = 'unknown@unknown.unknown'
                                     msg = 'No  From field, used   [' + new_from + ']'
-                                    EudoraLog.log.record( msg, msg_no, line_no )
-                                    EudoraLog.log.error( msg, msg_no, line_no )
+                                    EudoraLog.log.log( msg )
+                                    EudoraLog.log.error( msg )
                             else:
-                                    EudoraLog.log.record( 'Had From field, used   [' \
-                                                           + new_from + ']', msg_no, line_no )
+                                    EudoraLog.log.log( 'Had From field, used   [' + new_from + ']')
 
                     # Extract an e-mail address from $new_from with a _greedy_
                     # match, if it matches on <...>, i.e. use the question mark (?)
@@ -411,12 +464,13 @@ class Header:
                                             email_address = new_from
 
                     email_address = email_address.strip()
-                    EudoraLog.log.record( 'e-mail address extracted <' + email_address + '>',
-                                          msg_no, line_no )
+                    EudoraLog.log.log( 'e-mail address extracted <' + email_address + '>')
 
                     hdr_line0 = hdr_line0.replace( r'???@???', email_address, 1 )
 
-                    self.setValue( 'From ', hdr_line0 )
+		    print hdr_line0
+
+                    self.replaceValue( 'From ', hdr_line0 )
 
             # Add a 'X-Eudora2Unix: ' header (if $emit_X_Eudora2Unix_Header is true)
             # This header is like (example: February 28, 2002 14:42:42 UTC+01:00):
@@ -434,7 +488,7 @@ class Header:
                     # See also sub iso_8601_zulu(), provided for pleasure but not used
                     # here, as again, a function call proved to perform worse by a factor
                     # of 2 to 3 as compared to using the code directly.
-                    self.add( 'X-Eudora2Unix:', common.iso_8601_zulu() + ' converted' )
+                    self.add( 'X-Eudora2Unix:', iso_8601_zulu() + ' converted' )
 
             # Pull status and priority info out of the '.toc' file
             if toc:
@@ -466,7 +520,6 @@ class Header:
                                                     hpri = 'F'
                                             self.setValue( 'X-Status:', hpri )
                     else:
-                            EudoraLog.log.warn( "No toc entry for message at offset "
-                                                + offset_str, msg_no, line_no )
+                            EudoraLog.log.warn( "No toc entry for message at offset " + offset_str)
 
             self.cleaned = True

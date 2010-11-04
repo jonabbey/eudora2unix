@@ -52,7 +52,6 @@ __credits__ = """
 import os
 import re
 import sys
-import time
 import string
 import getopt
 import urllib
@@ -111,23 +110,16 @@ if sys.hexversion < 33686000:
 		+ os.linesep )
 	sys.exit( 1 )
 
-# Configuration.
-
-# Add a 'X-Eudora2Unix: <ISO 8601 date> converted' header at the end
-# of the emitted headers (see sub emit_headers),  0=no, 1=yes.
-# This can come in handy later to differentiate between 'new' KMail
-# messages and those inherited from the conversion.
-
-emit_X_Eudora2Unix_Header = 1
-
-# End of configuration.
-
 # Program name and title in various banners.
 P = sys.argv[0]
 
 exit_code = 0	# exit code: 0 if all ok, 1 if any warnings or errors
 
 re_attachment = re.compile( '^Attachment converted: (.*?)$', re.IGNORECASE )
+re_multi_contenttype = re.compile( r'^Content-Type: multipart/([^;]+);.*', re.IGNORECASE )
+re_single_contenttype = re.compile( r'^Content-Type: ([^;]+);', re.IGNORECASE )
+re_charset_contenttype = re.compile( r'charset="([^"]+)"', re.IGNORECASE )
+re_boundary_contenttype = re.compile( r'boundary="([^"]+)"', re.IGNORECASE )
 
 def convert( mbx, opts = None ):
 	"""
