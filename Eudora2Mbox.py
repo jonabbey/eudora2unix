@@ -237,6 +237,32 @@ def convert( mbx, opts = None ):
 					# here is where we could
 					# create the message
 
+					contenttype = headers.getValue('content-type')
+
+					if not contenttype:
+						message = MIMENonMultipart('text', 'plain')
+					elif not re_multi_contenttype.search( contenttype ):
+						if re_single_contenttype.search ( contenttype ):
+							mimetype = re_single_contenttype.sub( r'\1', contenttype )
+							(main, slash, sub) = mimetype.partition( '/' )
+							message = MIMENonMultipart(main, sub)
+					else:
+						subtype = re_multi_contenttype.sub( r'\1', contenttype )
+						if subtype:
+							message = MIMEMultipart(_subtype=subtype)
+						else:
+							message = MIMEMultipart()
+
+					# set all the headers we've seen
+
+					headers.clean(toc_info, msg_offset, replies)
+
+					for header, value in headers:
+						newheader = header[:-1]
+						message[newheader] = value
+
+					print str(message)
+
 					emit_headers( headers, toc_info,
 					msg_offset, EudoraLog.msg_no, replies, OUTPUT )
 					headers = None
