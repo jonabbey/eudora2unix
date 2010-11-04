@@ -29,13 +29,13 @@ class Log:
 	total_msgs = 0
 	exit_code = 0
 
-	def __init__( self, mbx):
+	def __init__(self, mbx):
 		self.mbxname = mbx
 		self.log_msgs = 0
 		self.warn_msgs = 0
 		self.error_msgs = 0
 		
-	def record( self, msg, verbosity ):
+	def record(self, filename, msg, verbosity):
 		global P, verbose
 		msg += os.linesep
 		out = self.mbxname + ' (msg #' + `msg_no` + ', line #' \
@@ -45,12 +45,12 @@ class Log:
 			print out
 
 		try:
-			OUT = open( self.filename, 'a' )
+			OUT = open( filename, 'a' )
 			OUT.write( out + os.linesep )
 			OUT.flush()
 		except IOError, ( errno, strerror ):
 			return fatal( P + ': cannot open "' 
-				      + self.filename + '"' + ": " + strerror )
+				      + filename + '"' + ": " + strerror )
 		finally:
 			if OUT:
 				OUT.close()
@@ -62,7 +62,7 @@ class Log:
 		if n_msgs == 1: return '1 ' + logtype + ' message'
 		if n_msgs >= 1: return `self.log_msgs` + logtype + ' messages'
 
-	def summary( self ):
+	def summary(self):
 		return self._summary(self.log_msgs, 'log') + os.linesep + \
 		    self._summary(self.warn_msgs, 'warning') + os.linesep + \
 		    self._summary(self.error_msgs, 'error') + os.linesep
