@@ -253,16 +253,22 @@ def convert_directory( eudoradir, opts ):
 	for f, v in opts:
 		if f == '-t':
 			target = v.strip().lower()
-	for f, v in opts:
-		if f == '-d':
+		elif f == '-d':
 			targetdir = v.strip()
 	if targetdir == '':
-		if( target == 'kmail' ):
+		if target == 'kmail':
 			targetdir = 'Mail'
 		else:
 			targetdir = 'mail' # works for pine
 		opts.append( ( '-t', targetdir ) )
-	maildir = join( os.environ['HOME'], targetdir + '.e2u' )
+
+	print targetdir
+
+	if targetdir[0] == '/':
+		maildir = targetdir
+	else:
+		maildir = join( os.environ['HOME'], targetdir + '.e2u' )
+
 	maildirLENGTH = len( maildir )
 
 	eudoradir = abspath( eudoradir )
@@ -285,10 +291,10 @@ def convert_directory( eudoradir, opts ):
 
 	isMac = isfile( 'In' )
 
-	if( not isMac and not isfile( 'In.mbx' )
-			and not isfile( 'in.mbx' )
-			and not isfile( 'IN.mbx' )
-			and not isfile( 'IN.MBX' ) ):
+	if ( not isMac and not isfile('In.mbx')
+	     and not isfile('in.mbx')
+	     and not isfile('IN.mbx')
+	     and not isfile('IN.MBX') ):
 		complain( not_eudora_directory_complaint() )
 		sys.exit( 1 )
 	#
