@@ -19,6 +19,12 @@ LOG_SFX = '.E2U_LOG'
 ERR_SFX = '.E2U_ERR'
 WARN_SFX = '.E2U_WARN'
 
+def fatal(msg):
+	if msg and len( msg ) > 0:
+		print >> sys.stderr, msg
+	return 1
+
+
 # SW
 class Log:
 	"""A log dedicated to a specific Eudora2Mbox mail box that we
@@ -28,6 +34,7 @@ class Log:
 
 	total_msgs = 0
 	exit_code = 0
+
 
 	def __init__(self, mbx):
 		self.mbxname = mbx

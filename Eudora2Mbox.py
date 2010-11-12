@@ -61,7 +61,6 @@ from email.mime.nonmultipart import MIMENonMultipart
 from mailbox import mbox
 
 from Header import Replies, TOC_Info, Header, strip_linesep, re_message_start
-from common import fatal
 import EudoraLog
 
 #
@@ -148,7 +147,7 @@ def convert( mbx, opts = None ):
 	print "Converting %s", (mbx)
 
 	if not mbx:
-		fatal( P + ': usage: Eudora2Mbox.py eudora-mailbox-file.mbx' )
+		EudoraLog.fatal( P + ': usage: Eudora2Mbox.py eudora-mailbox-file.mbx' )
 		return 0
 
 	attachments_dir = None
@@ -175,7 +174,7 @@ def convert( mbx, opts = None ):
 		INPUT = open( mbx, 'r' )
 	except IOError, ( errno, strerror ):
 		INPUT = None
-		return fatal( P + ': cannot open "' + mbx + '", ' + strerror )
+		return EudoraLog.fatal( P + ': cannot open "' + mbx + '", ' + strerror )
 
 	newfile = mbx + '.new'
 
@@ -183,7 +182,7 @@ def convert( mbx, opts = None ):
 		newmailbox = mbox( newfile )
 	except IOError, ( errno, strerror ):
 		mailbox = None
-		return fatal( P + ': cannot open "' + newfile + '", ' + strerror )
+		return EudoraLog.fatal( P + ': cannot open "' + newfile + '", ' + strerror )
 
 	toc_info = TOC_Info( mbx )
 	replies = Replies( INPUT )
@@ -312,7 +311,7 @@ def convert( mbx, opts = None ):
 		try:
 			INPUT.close()
 		except IOError:
-			return fatal( P + ': cannot close "' + mbx + '"' )
+			return EudoraLog.fatal( P + ': cannot close "' + mbx + '"' )
 
 	return 0
 
