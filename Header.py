@@ -52,6 +52,7 @@ date_pat = r'\s*\S+?\s*(\S{3})\s+(\S{3})\s+(\d{1,2})'
 time_pat = r'\s*(\d{2}:\d{2}:\d{2})\s+(\d{4})\s*([+-]\d{4}){0,1}'
 re_from_date_time = re.compile( date_pat + time_pat )
 re_message_start = re.compile( r'^From' + date_pat + time_pat )
+re_timeout_protection = re.compile( r'^X-(NortonAV|Symantec)-TimeoutProtection' )
 
 def strip_linesep( line ):
 	"""Regular expressions proved too slow, and rstrip doesn't take
@@ -302,6 +303,9 @@ class Header:
 
             # Comment out most repeated headers, except a few that
             # make sense to be repeated
+
+	    if ( re_timeout_protection.match( line ) ):
+		    return
 
             if( id and not id.lower() in Header.ok_to_dup and self.getValue( id ) ):
                 EudoraLog.log.warn( "extra '" + id +
