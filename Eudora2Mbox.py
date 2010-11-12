@@ -144,7 +144,7 @@ def convert( mbx, opts = None ):
 
 	"""
 
-	print "Converting %s", (mbx)
+	print "Converting %s" % (mbx,)
 
 	if not mbx:
 		EudoraLog.fatal( P + ': usage: Eudora2Mbox.py eudora-mailbox-file.mbx' )
@@ -218,8 +218,8 @@ def convert( mbx, opts = None ):
 				#
 				EudoraLog.log.error( 'Message start found inside message',
 						     EudoraLog.msg_no, EudoraLog.line_no )
-				emit_headers( headers, toc_info,
-					      msg_offset, EudoraLog.msg_no, replies, OUTPUT )
+				#emit_headers( headers, toc_info,
+				#	      msg_offset, EudoraLog.msg_no, replies, OUTPUT )
 
 			msg_offset = last_file_position
 			headers = Header()
@@ -259,21 +259,25 @@ def convert( mbx, opts = None ):
 					for header, value in headers:
 						newheader = header[:-1]
 						message[newheader] = value
+					
+					myfrom = headers.getValue('From ')
+
+					message.set_unixfrom('From ' + headers.getValue('From '))
 
 					print str(message)
 
-					emit_headers( headers, toc_info,
-					msg_offset, EudoraLog.msg_no, replies, OUTPUT )
+					# emit_headers( headers, toc_info,
+					# msg_offset, EudoraLog.msg_no, replies, OUTPUT )
+
 					headers = None
 					# Blank line separates headers and body
 					# of message text
-					print >> OUTPUT
 				else:
 					# Message header
 					headers.add_line(line)
 
 			else:
-				if attachments_dir and re_attachment.search( line ):
+				if False and attachments_dir and re_attachment.search( line ):
 					handle_attachment( line, target, 
 							   attachments_dir, OUTPUT,
 							   EudoraLog.msg_no, EudoraLog.line_no )
@@ -281,7 +285,7 @@ def convert( mbx, opts = None ):
 					# Message body, simply output the line.
 					# Since it's not stripped, don't add 
 					# line end
-					print >> OUTPUT, strip_linesep( line )
+					print strip_linesep( line )
 				last_file_position = INPUT.tell()
 
 	# Check if the file isn't empty and any messages have been processed.
