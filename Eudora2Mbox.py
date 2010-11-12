@@ -309,13 +309,17 @@ def convert( mbx, opts = None ):
 	# 	'grep "^From ???@???" file.mbx | wc -l | awk '{ print $1 }'
 	#
 	#log_msg ("total number of message(s): $EudoraLog.msg_no")
+
+	print
  
-	if EudoraLog.msg_no == 0: msg_str = '          no messages' 
-	if EudoraLog.msg_no == 1: msg_str = 'total:     1 message' 
-	if EudoraLog.msg_no >= 1: msg_str = 'total: %d messages' % (EudoraLog.msg_no,)
+	if EudoraLog.msg_no == 0: msg_str = 'total: Converted no messages' 
+	if EudoraLog.msg_no == 1: msg_str = 'total: Converted 1 message' 
+	if EudoraLog.msg_no >= 1: msg_str = 'total: Converted %d messages' % (EudoraLog.msg_no,)
+
+	print msg_str
 
 	if EudoraLog.verbose >= 0:
-		EudoraLog.log.summary()
+		print EudoraLog.log.summary()
 
 	# Finish up. Close failures usually indicate filesystem full.
 

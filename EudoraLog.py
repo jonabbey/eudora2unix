@@ -67,7 +67,7 @@ class Log:
 	def _summary(self, n_msgs, logtype):
 		if n_msgs == 0: return 'no ' + logtype + ' messages'
 		if n_msgs == 1: return '1 ' + logtype + ' message'
-		if n_msgs >= 1: return `self.log_msgs` + logtype + ' messages'
+		if n_msgs >= 1: return str(n_msgs) + ' ' + logtype + ' messages'
 
 	def summary(self):
 		return self._summary(self.log_msgs, 'log') + os.linesep + \
