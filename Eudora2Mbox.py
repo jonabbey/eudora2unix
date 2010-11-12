@@ -307,23 +307,21 @@ def convert( mbx, opts = None ):
  
 	if EudoraLog.msg_no == 0: msg_str = '          no messages' 
 	if EudoraLog.msg_no == 1: msg_str = 'total:     1 message' 
-	if EudoraLog.msg_no >= 1: msg_str = 'total: %(EudoraLog.msg_no)5d messages' % vars()
-
-	warn_err_str = warn.summary() + ', ' + EudoraLog.log.summary()
+	if EudoraLog.msg_no >= 1: msg_str = 'total: %d messages' % (EudoraLog.msg_no,)
 
 	if EudoraLog.verbose >= 0:
-		print '    ' + msg_str + '( ' + warn_err_str + ' )'
+		EudoraLog.log.summary()
 
 	# Finish up. Close failures usually indicate filesystem full.
+
+	if newmailbox:
+		newmailbox.close()
+
 	if INPUT:
 		try:
 			INPUT.close()
 		except IOError:
 			return EudoraLog.fatal( P + ': cannot close "' + mbx + '"' )
-
-
-	if newmailbox:
-		newmailbox.close()
 
 	return 0
 
