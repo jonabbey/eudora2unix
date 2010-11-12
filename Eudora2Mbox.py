@@ -257,9 +257,10 @@ def convert( mbx, opts = None ):
 					headers.clean(toc_info, msg_offset, replies)
 
 					for header, value in headers:
-						newheader = header[:-1]
-						message[newheader] = value
-					
+						if header != 'From ':
+							newheader = header[:-1]
+							message[newheader] = value
+
 					myfrom = headers.getValue('From ')
 
 					message.set_unixfrom('From ' + headers.getValue('From '))
