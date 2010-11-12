@@ -356,8 +356,6 @@ class Header:
 
             hdr_line0 = self.getValue( 'From ' )	# still has line end
 
-	    print "Hey first hdr_line0 is: %s" % (hdr_line0,)
-
             # Handle "Date: " and "From: " fields specially.
             # Keep the first encountered non-empty value in $hdr_date and
             # $hdr_from, thus ignoring subsequent Date:'s and From:'s, that
@@ -426,7 +424,6 @@ class Header:
             if not new_from:
                     new_from = commented_from
             if hdr_line0.find( '???@???' ) > -1:
-		    print "Hey found something: %s" % (hdr_line0,)
                     if not new_from:
                             if not new_from:
                                     new_from = self.getValue( 'Send:' )
@@ -464,11 +461,9 @@ class Header:
                                             email_address = new_from
 
                     email_address = email_address.strip()
-                    EudoraLog.log.log( 'e-mail address extracted <' + email_address + '>')
+#                    EudoraLog.log.log( 'e-mail address extracted <' + email_address + '>')
 
                     hdr_line0 = hdr_line0.replace( r'???@???', email_address, 1 )
-
-		    print hdr_line0
 
                     self.replaceValue( 'From ', hdr_line0 )
 
