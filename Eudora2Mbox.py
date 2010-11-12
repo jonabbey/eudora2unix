@@ -187,6 +187,8 @@ def convert( mbx, opts = None ):
 	toc_info = TOC_Info( mbx )
 	replies = Replies( INPUT )
 
+	msg_lines = []
+
 	# Main loop, that reads the mailbox file and converts.
 	#
 	# Sad issues with the nice python construct
@@ -203,9 +205,18 @@ def convert( mbx, opts = None ):
 
 		# find returns -1 (i.e., true) if it couldn't find
 		# 'Find ', so in fact this next if is looking to see
-		# if the line does *not* begin with 'Find '
+		# if the line does *not* begin with 'Find '.
+		#
+		# I'm not sure what the original author was trying to
+		# avoid here with the test for 'Find '..
 
 		if line.find( 'Find ', 0, 5 ) and re_message_start.match( line ):
+			if msg_lines:
+				msg_text = ''.join(msg_lines)
+				message.set_payload(msg_text)
+
+				print str(message)
+
 			if headers:
 				# Error
 				#
@@ -216,8 +227,7 @@ def convert( mbx, opts = None ):
 				# headers and start the message body.
 				# Finally, emit this as a message
 				#
-				EudoraLog.log.error( 'Message start found inside message',
-						     EudoraLog.msg_no, EudoraLog.line_no )
+				EudoraLog.log.error( 'Message start found inside message')
 				#emit_headers( headers, toc_info,
 				#	      msg_offset, EudoraLog.msg_no, replies, OUTPUT )
 
@@ -268,27 +278,24 @@ def convert( mbx, opts = None ):
 
 					message.set_unixfrom('From ' + headers.getValue('From '))
 
-					print str(message)
-
 					headers = None
+
+					msg_lines = []
 			else:
+				# We're in the body of the text
 				if False and attachments_dir and re_attachment.search( line ):
 					handle_attachment( line, target, 
 							   attachments_dir, OUTPUT,
 							   EudoraLog.msg_no, EudoraLog.line_no )
 				else:
-					# Message body, simply output the line.
-					# Since it's not stripped, don't add 
-					# line end
-					print strip_linesep( line )
+					msg_lines.append(line)
 				last_file_position = INPUT.tell()
 
 	# Check if the file isn't empty and any messages have been processed.
 	if EudoraLog.line_no == 0:
-		EudoraLog.log.warn( 'empty file', EudoraLog.msg_no, EudoraLog.line_no )
+		EudoraLog.log.warn( 'empty file' )
 	elif EudoraLog.msg_no == 0:
-		EudoraLog.log.error( 'no messages (not a Eudora mailbox file?)',
-				     EudoraLog.msg_no, EudoraLog.line_no )
+		EudoraLog.log.error( 'no messages (not a Eudora mailbox file?)' )
 
 	# For debugging and comparison with a:
 	#
