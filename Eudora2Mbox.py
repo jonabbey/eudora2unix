@@ -119,6 +119,9 @@ re_multi_contenttype = re.compile( r'^Content-Type: multipart/([^;]+);.*', re.IG
 re_single_contenttype = re.compile( r'^Content-Type: ([^;]+);', re.IGNORECASE )
 re_charset_contenttype = re.compile( r'charset="([^"]+)"', re.IGNORECASE )
 re_boundary_contenttype = re.compile( r'boundary="([^"]+)"', re.IGNORECASE )
+re_xflowed = re.compile( r'</?x-flowed>')
+
+scrub_xflowed = False
 
 def convert( mbx, opts = None ):
 	"""
@@ -290,6 +293,8 @@ def convert( mbx, opts = None ):
 							   attachments_dir, OUTPUT,
 							   EudoraLog.msg_no, EudoraLog.line_no )
 				else:
+					if scrub_xflowed:
+						line = re.sub(re_xflowed, '', line)
 					msg_lines.append(strip_linesep(line) + "\n")
 				last_file_position = INPUT.tell()
 
