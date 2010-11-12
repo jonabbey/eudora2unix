@@ -215,7 +215,9 @@ def convert( mbx, opts = None ):
 				msg_text = ''.join(msg_lines)
 				message.set_payload(msg_text)
 
-				print str(message)
+				newmailbox.add(message)
+
+				print ".", 
 
 			if headers:
 				# Error
@@ -288,7 +290,7 @@ def convert( mbx, opts = None ):
 							   attachments_dir, OUTPUT,
 							   EudoraLog.msg_no, EudoraLog.line_no )
 				else:
-					msg_lines.append(line)
+					msg_lines.append(strip_linesep(line) + "\n")
 				last_file_position = INPUT.tell()
 
 	# Check if the file isn't empty and any messages have been processed.
@@ -318,6 +320,10 @@ def convert( mbx, opts = None ):
 			INPUT.close()
 		except IOError:
 			return EudoraLog.fatal( P + ': cannot close "' + mbx + '"' )
+
+
+	if newmailbox:
+		newmailbox.close()
 
 	return 0
 
