@@ -120,8 +120,10 @@ re_single_contenttype = re.compile( r'^Content-Type: ([^;]+);', re.IGNORECASE )
 re_charset_contenttype = re.compile( r'charset="([^"]+)"', re.IGNORECASE )
 re_boundary_contenttype = re.compile( r'boundary="([^"]+)"', re.IGNORECASE )
 re_xflowed = re.compile( r'</?x-flowed>')
+re_xhtml = re.compile( r'</?x-html>' )
+re_pete_stuff = re.compile ( r'<!x-stuff-for-pete[^>]+>' )
 
-scrub_xflowed = False
+scrub_xflowed = True
 
 def convert( mbx, opts = None ):
 	"""
@@ -295,6 +297,8 @@ def convert( mbx, opts = None ):
 				else:
 					if scrub_xflowed:
 						line = re.sub(re_xflowed, '', line)
+						line = re.sub(re_xhtml, '', line)
+						line = re.sub(re_pete_stuff, '', line)
 					msg_lines.append(strip_linesep(line) + "\n")
 				last_file_position = INPUT.tell()
 
