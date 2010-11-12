@@ -230,7 +230,10 @@ def convert( mbx, opts = None ):
 				if re_initial_whitespace.match( line ):
 					# Header "folding" (RFC 2822 3.2.3)
 					headers.appendToLast( line )
-				elif len( line.strip() ) == 0: 
+				elif len( line.strip() ) != 0:
+					# Message header
+					headers.add_line(line)
+				else:
 					# End of message headers.
 
 					# here is where we could
@@ -267,16 +270,7 @@ def convert( mbx, opts = None ):
 
 					print str(message)
 
-					# emit_headers( headers, toc_info,
-					# msg_offset, EudoraLog.msg_no, replies, OUTPUT )
-
 					headers = None
-					# Blank line separates headers and body
-					# of message text
-				else:
-					# Message header
-					headers.add_line(line)
-
 			else:
 				if False and attachments_dir and re_attachment.search( line ):
 					handle_attachment( line, target, 
