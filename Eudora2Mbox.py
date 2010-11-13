@@ -115,10 +115,11 @@ P = sys.argv[0]
 exit_code = 0	# exit code: 0 if all ok, 1 if any warnings or errors
 
 re_attachment = re.compile( '^Attachment converted: (.*?)$', re.IGNORECASE )
-re_multi_contenttype = re.compile( r'^Content-Type: multipart/([^;]+);.*', re.IGNORECASE )
-re_single_contenttype = re.compile( r'^Content-Type: ([^;]+);', re.IGNORECASE )
+re_multi_contenttype = re.compile( r'^multipart/([^;]+);.*', re.IGNORECASE )
+re_single_contenttype = re.compile( r'^([^;]+);?.*', re.IGNORECASE )
 re_charset_contenttype = re.compile( r'charset="([^"]+)"', re.IGNORECASE )
 re_boundary_contenttype = re.compile( r'boundary="([^"]+)"', re.IGNORECASE )
+re_contenttype = re.compile( r'content-type', re.IGNORECASE )
 re_xflowed = re.compile( r'</?x-flowed>')
 re_xhtml = re.compile( r'</?x-html>' )
 re_pete_stuff = re.compile ( r'<!x-stuff-for-pete[^>]+>' )
@@ -218,6 +219,7 @@ def convert( mbx, opts = None ):
 		if line.find( 'Find ', 0, 5 ) and re_message_start.match( line ):
 			if msg_lines:
 				msg_text = ''.join(msg_lines)
+
 				message.set_payload(msg_text)
 
 				newmailbox.add(message)
@@ -256,7 +258,7 @@ def convert( mbx, opts = None ):
 					# here is where we could
 					# create the message
 
-					contenttype = headers.getValue('content-type')
+					contenttype = headers.getValue('Content-Type:')
 
 					if not contenttype:
 						message = MIMENonMultipart('text', 'plain')
@@ -265,6 +267,8 @@ def convert( mbx, opts = None ):
 							mimetype = re_single_contenttype.sub( r'\1', contenttype )
 							(main, slash, sub) = mimetype.partition( '/' )
 							message = MIMENonMultipart(main, sub)
+						else:
+							print "*** %s" % (contenttype,)
 					else:
 						subtype = re_multi_contenttype.sub( r'\1', contenttype )
 						if subtype:
@@ -277,7 +281,7 @@ def convert( mbx, opts = None ):
 					headers.clean(toc_info, msg_offset, replies)
 
 					for header, value in headers:
-						if header != 'From ':
+						if header != 'From ' and not re_contenttype.match( header ):
 							newheader = header[:-1]
 							message[newheader] = value
 
