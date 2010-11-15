@@ -61,7 +61,9 @@ from email.mime.nonmultipart import MIMENonMultipart
 from email.mime.base import MIMEBase
 from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 from mailbox import mbox
+import mimetypes
 
 from Header import Replies, TOC_Info, Header, strip_linesep, re_message_start
 import EudoraLog
@@ -125,7 +127,10 @@ re_boundary_contenttype = re.compile( r'boundary="([^"]+)"', re.IGNORECASE )
 re_contenttype = re.compile( r'content-type', re.IGNORECASE )
 re_xflowed = re.compile( r'</?x-flowed>')
 re_xhtml = re.compile( r'</?x-html>' )
-re_pete_stuff = re.compile ( r'<!x-stuff-for-pete[^>]+>' )
+re_pete_stuff = re.compile( r'<!x-stuff-for-pete[^>]+>' )
+re_filename_cleaner = re.compile( r'^(.*\.\S+).*$' )
+
+mimetypes.init()
 
 scrub_xflowed = True
 
@@ -198,6 +203,7 @@ def convert( mbx, opts = None ):
 
 	msg_lines = []
 	attachments = []
+	is_html = False
 
 	# Main loop, that reads the mailbox file and converts.
 	#
@@ -225,7 +231,10 @@ def convert( mbx, opts = None ):
 				msg_text = ''.join(msg_lines)
 
 				if attachments:
-					message.attach(MIMEText(msg_text))
+					if is_html:
+						message.attach(MIMEText(msg_text, _subtype='html'))
+					else:
+						message.attach(MIMEText(msg_text))
 				else:
 					message.set_payload(msg_text)
 
@@ -254,6 +263,7 @@ def convert( mbx, opts = None ):
 			msg_offset = last_file_position
 			headers = Header()
 			headers.add( 'From ', line[5:].strip() )
+			is_html = False
 			EudoraLog.msg_no += 1
 		else:
 			if headers:
@@ -307,12 +317,20 @@ def convert( mbx, opts = None ):
 					attachments = []
 			else:
 				# We're in the body of the text
+
+				if re_xhtml.search ( line ):
+					is_html = True
+				
 				if attachments_dir and re_attachment.search( line ):
+					# remove the newline that
+					# Eudora inserts before the
+					# 'Attachment Converted' line.
+
+					if msg_lines[-1] == '\n' or msg_lines[-1] == '\r\n':
+						msg_lines.pop()
+
 					EudoraLog.log.warn("\Adding attachment with contenttype = " + contenttype)
 					attachments.append( (line, target) )
-					#handle_attachment( line, target, 
-					#		   attachments_dir,
-					#		   message )
 				else:
 					if scrub_xflowed:
 						line = re.sub(re_xflowed, '', line)
@@ -407,9 +425,29 @@ def handle_attachment( line, target, attachments_dir, message ):
 		if not os.path.isabs( target ):
 			file = os.path.join( os.environ['HOME'], file )
 
+		cleaned_filename = re_filename_cleaner.sub( r'\1', file )
+			
+		mimeinfo = mimetypes.guess_type(cleaned_filename)
+
+		print "File is %s [%s], mime info is %s" % (file, cleaned_filename, str(mimeinfo))
+
+		if not mimeinfo[0]:
+			(mimetype, mimesubtype) = ('application', 'octet-stream')
+		else:
+			(mimetype, mimesubtype) = mimeinfo[0].split('/')
+
 		if os.path.isfile(file):
 			fp = open(file, 'rb')
-			msg = MIMEApplication(fp.read())
+
+			if mimetype == 'application':
+				msg = MIMEApplication(fp.read(), _subtype=mimesubtype)
+			elif mimetype == 'image':
+				msg = MIMEImage(fp.read(), _subtype=mimesubtype)
+			elif mimetype == 'text':
+				msg = MIMEText(fp.read(), _subtype=mimesubtype)
+			else:
+				EudoraLog.log.error("Unrecognized mime type '%s' while processing attachment '%s'" % (mimestring, file))
+
 			fp.close()
 			msg.add_header('Content-Disposition', 'attachment', filename=name)
 
