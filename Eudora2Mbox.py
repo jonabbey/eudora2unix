@@ -234,7 +234,6 @@ def convert( mbx, opts = None ):
 						handle_attachment( aline, atarget, attachments_dir, message )
 
 				newmailbox.add(message)
-				newmailbox.flush()
 
 				print ".", 
 
@@ -297,8 +296,6 @@ def convert( mbx, opts = None ):
 						if header != 'From ' and not re_contenttype.match( header ):
 							newheader = header[:-1]
 							message[newheader] = value
-						else:
-							print "Skipping %s: %s" % (header, value)
 
 					myfrom = headers.getValue('From ')
 
