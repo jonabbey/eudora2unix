@@ -55,9 +55,12 @@ import sys
 import string
 import getopt
 import urllib
-from email import message
+from email import message, encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.nonmultipart import MIMENonMultipart
+from email.mime.base import MIMEBase
+from email.mime.application import MIMEApplication
+from email.mime.text import MIMEText
 from mailbox import mbox
 
 from Header import Replies, TOC_Info, Header, strip_linesep, re_message_start
@@ -194,6 +197,7 @@ def convert( mbx, opts = None ):
 	replies = Replies( INPUT )
 
 	msg_lines = []
+	attachments = []
 
 	# Main loop, that reads the mailbox file and converts.
 	#
@@ -220,9 +224,17 @@ def convert( mbx, opts = None ):
 			if msg_lines:
 				msg_text = ''.join(msg_lines)
 
-				message.set_payload(msg_text)
+				if attachments:
+					message.attach(MIMEText(msg_text))
+				else:
+					message.set_payload(msg_text)
+
+				if attachments:
+					for aline, atarget in attachments:
+						handle_attachment( aline, atarget, attachments_dir, message )
 
 				newmailbox.add(message)
+				newmailbox.flush()
 
 				print ".", 
 
@@ -272,6 +284,7 @@ def convert( mbx, opts = None ):
 					else:
 						subtype = re_multi_contenttype.sub( r'\1', contenttype )
 						if subtype:
+							print "Hey, subtype = " + subtype
 							message = MIMEMultipart(_subtype=subtype)
 						else:
 							message = MIMEMultipart()
@@ -284,6 +297,8 @@ def convert( mbx, opts = None ):
 						if header != 'From ' and not re_contenttype.match( header ):
 							newheader = header[:-1]
 							message[newheader] = value
+						else:
+							print "Skipping %s: %s" % (header, value)
 
 					myfrom = headers.getValue('From ')
 
@@ -292,12 +307,15 @@ def convert( mbx, opts = None ):
 					headers = None
 
 					msg_lines = []
+					attachments = []
 			else:
 				# We're in the body of the text
-				if False and attachments_dir and re_attachment.search( line ):
-					handle_attachment( line, target, 
-							   attachments_dir, OUTPUT,
-							   EudoraLog.msg_no, EudoraLog.line_no )
+				if attachments_dir and re_attachment.search( line ):
+					EudoraLog.log.warn("\Adding attachment with contenttype = " + contenttype)
+					attachments.append( (line, target) )
+					#handle_attachment( line, target, 
+					#		   attachments_dir,
+					#		   message )
 				else:
 					if scrub_xflowed:
 						line = re.sub(re_xflowed, '', line)
@@ -343,7 +361,7 @@ def convert( mbx, opts = None ):
 	return 0
 
 
-def handle_attachment( line, target, attachments_dir, OUTPUT, msg_no, line_no ):
+def handle_attachment( line, target, attachments_dir, message ):
 	"""
 	Mac versions put "Attachment converted", Windows (Lite) has
 	"Attachment Converted". 
@@ -385,15 +403,24 @@ def handle_attachment( line, target, attachments_dir, OUTPUT, msg_no, line_no ):
 		dlist = name.split( ":" ) # Mac path delim
 		name = dlist.pop().strip()	# pop off last portion of name
 	else:
-		print >> OUTPUT, "FAILED to convert attachment: \'" + attachment_desc + "\'"
-		warn.record( "FAILED to convert attachment: \'"
-				+ attachment_desc + "\'" , EudoraLog.msg_no, EudoraLog.line_no )
+		EudoraLog.log.warn( "FAILED to convert attachment: \'"
+				    + attachment_desc + "\'" )
 	if len( name ) > 0:
 		file = os.path.join( target, attachments_dir, name )
 		if not os.path.isabs( target ):
 			file = os.path.join( os.environ['HOME'], file )
-		file = urllib.quote( file )
-		print >> OUTPUT, 'Attachment converted: <file://' + file + '> ' + etc
+
+		if os.path.isfile(file):
+			fp = open(file, 'rb')
+			msg = MIMEApplication(fp.read())
+			fp.close()
+			msg.add_header('Content-Disposition', 'attachment', filename=name)
+
+			message.attach(msg)
+
+			EudoraLog.log.warn(" SUCCEEDED finding attachment: \'" + file + "\', name = \'" + name + "\'")
+		else:
+			EudoraLog.log.warn(" FAILED to find attachment: \'" + file + "\'" )
 
 #import profile
 # File argument (must be exactly 1).
