@@ -58,7 +58,6 @@ import urllib
 from email import message, encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.nonmultipart import MIMENonMultipart
-from email.mime.base import MIMEBase
 from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
@@ -404,6 +403,15 @@ def handle_attachment( line, target, attachments_dir, message ):
 	re_mac_info = re.compile( r'(.*?)\s(\(.*?\)).*$' )
 
 	attachment_desc = re_attachment.sub( '\\1', line )
+
+	attachment_desc = strip_linesep(attachment_desc)
+
+	# some of John's attachment names have an odd OutboundG4:
+	# prefix which is not present in the filenames on disk..
+
+	if attachment_desc.find('OutboundG4:') != -1:
+		attachment_desc = attachment_desc.replace('OutboundG4:', '')
+
 	name = ''
 	# if has :\, must be windows
 	etc = ''
@@ -420,13 +428,44 @@ def handle_attachment( line, target, attachments_dir, message ):
 	else:
 		EudoraLog.log.warn( "FAILED to convert attachment: \'"
 				    + attachment_desc + "\'" )
+		name = attachment_desc
+
 	if len( name ) > 0:
 		file = os.path.join( target, attachments_dir, name )
 		if not os.path.isabs( target ):
 			file = os.path.join( os.environ['HOME'], file )
 
+		if not os.path.exists(file):
+			if name.startswith('OutboundG4:'):
+				name = name[11:]
+				print "**** Hey, name is now %s" % (name, )
+				file = os.path.join(target, attachments_dir, name)
+
+		# our user has attachments that have / characters in
+		# the file name, but when they got copied over to
+		# unix, the / chars were taken out, if it would help.
+
+		if not os.path.exists(file):
+			if name.find('/') != -1:
+				name=name.replace('/','')
+				file = os.path.join(target, attachments_dir, name)
+
+		# our user also has attachments that have _ characters
+		# in the file name where the file on disk has spaces.
+		# translate that as well, if it would help.
+
+		if not os.path.exists(file):
+			if name.find('_') != -1:
+				name = name.replace('_', ' ')
+				file = os.path.join(target, attachments_dir, name)
+
+		# in our user's attachments, we have some files named
+		# akin to 'filename.ppt 1' and so forth.  we're going
+		# to trim anything after the first whitespace
+		# character after the first . in the filename
+
 		cleaned_filename = re_filename_cleaner.sub( r'\1', file )
-			
+
 		mimeinfo = mimetypes.guess_type(cleaned_filename)
 
 		print "File is %s [%s], mime info is %s" % (file, cleaned_filename, str(mimeinfo))
