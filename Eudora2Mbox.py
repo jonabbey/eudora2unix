@@ -459,6 +459,16 @@ def handle_attachment( line, target, attachments_dir, message ):
 				name = name.replace('_', ' ')
 				file = os.path.join(target, attachments_dir, name)
 
+		# our user actually also has attachments that have
+		# space characters in the file name where the file on
+		# disk has underscores.  if we didn't find the match
+		# after our last transform, try the rever
+
+		if not os.path.exists(file):
+			if name.find(' ') != -1:
+				name = name.replace(' ', '_')
+				file = os.path.join(target, attachments_dir, name)
+
 		# in our user's attachments, we have some files named
 		# akin to 'filename.ppt 1' and so forth.  we're going
 		# to trim anything after the first whitespace
