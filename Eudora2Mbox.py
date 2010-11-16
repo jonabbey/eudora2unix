@@ -132,6 +132,9 @@ re_filename_cleaner = re.compile( r'^(.*\.\S+).*$' )
 mimetypes.init()
 
 scrub_xflowed = True
+attachments_listed = 0
+attachments_found = 0
+attachments_missing = 0
 
 def convert( mbx, opts = None ):
 	"""
@@ -156,6 +159,12 @@ def convert( mbx, opts = None ):
 		Thu 03 Jan 2002 11:42:42    (24 characters)
 
 	"""
+
+	global attachments_listed, attachments_found, attachments_missing
+	
+	attachments_listed = 0
+	attachments_found = 0
+	attachments_missing = 0
 
 	print "Converting %s" % (mbx,)
 
@@ -292,7 +301,6 @@ def convert( mbx, opts = None ):
 					else:
 						subtype = re_multi_contenttype.sub( r'\1', contenttype )
 						if subtype:
-							print "Hey, subtype = " + subtype
 							message = MIMEMultipart(_subtype=subtype)
 						else:
 							message = MIMEMultipart()
@@ -328,7 +336,7 @@ def convert( mbx, opts = None ):
 					if msg_lines[-1] == '\n' or msg_lines[-1] == '\r\n':
 						msg_lines.pop()
 
-					EudoraLog.log.warn("\Adding attachment with contenttype = " + contenttype)
+					#EudoraLog.log.warn("Adding attachment with contenttype = " + contenttype)
 					attachments.append( (line, target) )
 				else:
 					if scrub_xflowed:
@@ -355,6 +363,10 @@ def convert( mbx, opts = None ):
 	if EudoraLog.msg_no == 0: msg_str = 'total: Converted no messages' 
 	if EudoraLog.msg_no == 1: msg_str = 'total: Converted 1 message' 
 	if EudoraLog.msg_no >= 1: msg_str = 'total: Converted %d messages' % (EudoraLog.msg_no,)
+
+	print "------------------------------"
+	print "Attachments Listed: %d\nAttachments Found: %d\nAttachments Missing:%d" % (attachments_listed, attachments_found, attachments_missing)
+	print "------------------------------"
 
 	print msg_str
 
@@ -395,6 +407,11 @@ def handle_attachment( line, target, attachments_dir, message ):
 	spaces in the filepath).  At least it makes more sense than
 	leaving the old filepath.
 	"""
+
+	global attachments_listed, attachments_found, attachments_missing
+
+	attachments_listed = attachments_listed + 1
+
 	re_dos_path_beginning = re.compile( r'.*:\\.*' )
 	# Mac 1.3.1 has e.g. (Type: 'PDF ' Creator: 'CARO')
 	# Mac 3.1 has e.g (PDF /CARO) (00000645)
@@ -478,6 +495,15 @@ def handle_attachment( line, target, attachments_dir, message ):
 
 		mimeinfo = mimetypes.guess_type(cleaned_filename)
 
+		if not os.path.exists(file):
+			if os.path.exists(cleaned_filename):
+				file = cleaned_filename
+			else:
+				file2 = file.replace('_', ' ')
+				cleaned_filename2 = re_filename_cleaner.sub( r'\1', file2)
+				if os.path.exists(cleaned_filename2):
+					file = cleaned_filename2
+
 		print "File is %s [%s], mime info is %s" % (file, cleaned_filename, str(mimeinfo))
 
 		if not mimeinfo[0]:
@@ -502,8 +528,11 @@ def handle_attachment( line, target, attachments_dir, message ):
 
 			message.attach(msg)
 
+			attachments_found = attachments_found + 1
+
 			EudoraLog.log.warn(" SUCCEEDED finding attachment: \'" + file + "\', name = \'" + name + "\'")
 		else:
+			attachments_missing = attachments_missing + 1
 			EudoraLog.log.warn(" FAILED to find attachment: \'" + file + "\'" )
 
 #import profile
