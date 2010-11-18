@@ -118,8 +118,8 @@ P = sys.argv[0]
 
 exit_code = 0	# exit code: 0 if all ok, 1 if any warnings or errors
 
-re_attachment = re.compile( '^Attachment converted: "?([^"]*)"?$', re.IGNORECASE )
-re_attachment = re.compile( '^Attachment converted: (.*)$', re.IGNORECASE )
+re_quoted_attachment = re.compile( r'^Attachment converted: "([^"]*)"\s*$', re.IGNORECASE )
+re_attachment = re.compile( r'^Attachment converted: (.*)$', re.IGNORECASE )
 re_multi_contenttype = re.compile( r'^multipart/([^;]+);.*', re.IGNORECASE )
 re_single_contenttype = re.compile( r'^([^;]+);?.*', re.IGNORECASE )
 re_charset_contenttype = re.compile( r'charset="([^"]+)"', re.IGNORECASE )
@@ -434,8 +434,13 @@ def handle_attachment( line, target, attachments_dir, message ):
 	# Mac 1.3.1 has e.g. (Type: 'PDF ' Creator: 'CARO')
 	# Mac 3.1 has e.g (PDF /CARO) (00000645)
 
-	# '^Attachment converted: "?([^"]*)"?$', re.IGNORECASE
-	attachment_desc = re_attachment.sub( '\\1', line )
+	if re_quoted_attachment.match(line):
+		attachment_desc = re_quoted_attachment.sub( '\\1', line )
+	else:
+		attachment_desc = re_attachment.sub( '\\1', line )
+
+	if attachment_desc.find('"') != -1:
+		print "**>>**", attachment_desc
 
 	attachment_desc = strip_linesep(attachment_desc)
 
