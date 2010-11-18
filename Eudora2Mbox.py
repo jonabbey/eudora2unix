@@ -118,7 +118,8 @@ P = sys.argv[0]
 
 exit_code = 0	# exit code: 0 if all ok, 1 if any warnings or errors
 
-re_attachment = re.compile( '^Attachment converted: (.*?)$', re.IGNORECASE )
+re_attachment = re.compile( '^Attachment converted: "?([^"]*)"?$', re.IGNORECASE )
+re_attachment = re.compile( '^Attachment converted: (.*)$', re.IGNORECASE )
 re_multi_contenttype = re.compile( r'^multipart/([^;]+);.*', re.IGNORECASE )
 re_single_contenttype = re.compile( r'^([^;]+);?.*', re.IGNORECASE )
 re_charset_contenttype = re.compile( r'charset="([^"]+)"', re.IGNORECASE )
@@ -128,6 +129,9 @@ re_xflowed = re.compile( r'</?x-flowed>')
 re_xhtml = re.compile( r'</?x-html>' )
 re_pete_stuff = re.compile( r'<!x-stuff-for-pete[^>]+>' )
 re_filename_cleaner = re.compile( r'^(.*\.\S+).*$' )
+# Don't like this.  Too greedy for parentheses.
+re_mac_info = re.compile( r'(.*?)\s(\(.*?\)).*$' )
+re_dos_path_beginning = re.compile( r'.*:\\.*' )
 
 mimetypes.init()
 
@@ -135,6 +139,8 @@ scrub_xflowed = True
 attachments_listed = 0
 attachments_found = 0
 attachments_missing = 0
+paths_found = {}
+paths_missing = {}
 
 def convert( mbx, opts = None ):
 	"""
@@ -161,6 +167,8 @@ def convert( mbx, opts = None ):
 	"""
 
 	global attachments_listed, attachments_found, attachments_missing
+
+	global paths_found, paths_missing
 	
 	attachments_listed = 0
 	attachments_found = 0
@@ -359,14 +367,24 @@ def convert( mbx, opts = None ):
 	#log_msg ("total number of message(s): $EudoraLog.msg_no")
 
 	print
+
+	print "\nMissing path count:"
+
+	for (path, count) in paths_missing.iteritems():
+		print "%s: %d" % (path, count)
+
+	print "\nFound path count:"
+
+	for (path, count) in paths_found.iteritems():
+		print "%s: %d" % (path, count)
  
+	print "\n------------------------------"
+	print "Attachments Listed: %d\nAttachments Found: %d\nAttachments Missing:%d" % (attachments_listed, attachments_found, attachments_missing)
+	print "------------------------------"
+
 	if EudoraLog.msg_no == 0: msg_str = 'total: Converted no messages' 
 	if EudoraLog.msg_no == 1: msg_str = 'total: Converted 1 message' 
 	if EudoraLog.msg_no >= 1: msg_str = 'total: Converted %d messages' % (EudoraLog.msg_no,)
-
-	print "------------------------------"
-	print "Attachments Listed: %d\nAttachments Found: %d\nAttachments Missing:%d" % (attachments_listed, attachments_found, attachments_missing)
-	print "------------------------------"
 
 	print msg_str
 
@@ -409,16 +427,14 @@ def handle_attachment( line, target, attachments_dir, message ):
 	"""
 
 	global attachments_listed, attachments_found, attachments_missing
+	global paths_found, paths_missing
 
 	attachments_listed = attachments_listed + 1
 
-	re_dos_path_beginning = re.compile( r'.*:\\.*' )
 	# Mac 1.3.1 has e.g. (Type: 'PDF ' Creator: 'CARO')
 	# Mac 3.1 has e.g (PDF /CARO) (00000645)
 
-	# Don't like this.  Too greedy for parentheses.
-	re_mac_info = re.compile( r'(.*?)\s(\(.*?\)).*$' )
-
+	# '^Attachment converted: "?([^"]*)"?$', re.IGNORECASE
 	attachment_desc = re_attachment.sub( '\\1', line )
 
 	attachment_desc = strip_linesep(attachment_desc)
@@ -435,6 +451,7 @@ def handle_attachment( line, target, attachments_dir, message ):
 	if re_dos_path_beginning.match( attachment_desc ):
 		desc_list = attachment_desc.split( "\\" ) # DOS backslashes
 		name = desc_list.pop().strip()	# pop off last portion of name
+		orig_path = "/".join(desc_list)
 		if name[-1] == '"':
 			name = name[:-1]
 	elif re_mac_info.match( line ):
@@ -442,10 +459,12 @@ def handle_attachment( line, target, attachments_dir, message ):
 		etc = re_mac_info.sub( '\\2', line ).strip() 
 		dlist = name.split( ":" ) # Mac path delim
 		name = dlist.pop().strip()	# pop off last portion of name
+		orig_path = "/".join(dlist)
 	else:
 		EudoraLog.log.warn( "FAILED to convert attachment: \'"
 				    + attachment_desc + "\'" )
 		name = attachment_desc
+		orig_path = attachment_desc
 
 	if len( name ) > 0:
 		file = os.path.join( target, attachments_dir, name )
@@ -530,10 +549,19 @@ def handle_attachment( line, target, attachments_dir, message ):
 
 			attachments_found = attachments_found + 1
 
-			EudoraLog.log.warn(" SUCCEEDED finding attachment: \'" + file + "\', name = \'" + name + "\'")
+			EudoraLog.log.warn(" SUCCEEDED finding attachment: \'" + attachment_desc + "\', name = \'" + name + "\'")
+			if orig_path in paths_found:
+				paths_found[orig_path] = paths_found[orig_path] + 1
+			else:
+				paths_found[orig_path] = 1
 		else:
 			attachments_missing = attachments_missing + 1
-			EudoraLog.log.warn(" FAILED to find attachment: \'" + file + "\'" )
+			EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
+
+			if orig_path in paths_missing:
+				paths_missing[orig_path] = paths_missing[orig_path] + 1
+			else:
+				paths_missing[orig_path] = 1
 
 #import profile
 # File argument (must be exactly 1).
