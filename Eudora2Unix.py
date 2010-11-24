@@ -462,9 +462,9 @@ def convert_files( avoid_dirlist, dir, names ):
 	Analyze by diffing with (e.g. diff-ing against the .E2U_ORIG version).
 	"""
 	# avoid any directory specified with a '-a' flag
-	for f, v in opts:
-		if f == '-a' and samefile( dir, v ):
-			return
+#	for f, v in opts:
+#		if f == '-a' and samefile( dir, v ):
+#			return
 	descmap = parse_descmap( dir )
 	for f in names:
 		fpath = join( dir, f )

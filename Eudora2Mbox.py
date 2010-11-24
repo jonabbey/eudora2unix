@@ -472,107 +472,114 @@ def handle_attachment( line, target, attachments_dir, message ):
 		name = attachment_desc
 		orig_path = attachment_desc
 
-	if len( name ) > 0:
-		file = os.path.join( target, attachments_dir, name )
-		if not os.path.isabs( target ):
-			file = os.path.join( os.environ['HOME'], file )
+	if len( name ) <= 0:
+		return
 
-		if not os.path.exists(file):
-			if name.startswith('OutboundG4:'):
-				name = name[11:]
-				print "**** Hey, name is now %s" % (name, )
-				file = os.path.join(target, attachments_dir, name)
+	attachments_dirs = attachments_dir.split(':')
+	file = None
 
-		# our user has attachments that have / characters in
-		# the file name, but when they got copied over to
-		# unix, the / chars were taken out, if it would help.
+	for adir in attachments_dirs:
+		if not file or not os.path.exists(file):
+			file = os.path.join( target, adir, name )
+			if not os.path.isabs( target ):
+				file = os.path.join( os.environ['HOME'], file )
 
-		if not os.path.exists(file):
-			if name.find('/') != -1:
-				name=name.replace('/','')
-				file = os.path.join(target, attachments_dir, name)
+			if not os.path.exists(file):
+				if name.startswith('OutboundG4:'):
+					name = name[11:]
+					print "**** Hey, name is now %s" % (name, )
+					file = os.path.join(target, attachments_dir, name)
 
-		# our user also has attachments that have _ characters
-		# in the file name where the file on disk has spaces.
-		# translate that as well, if it would help.
+			# our user has attachments that have / characters in
+			# the file name, but when they got copied over to
+			# unix, the / chars were taken out, if it would help.
 
-		if not os.path.exists(file):
-			if name.find('_') != -1:
-				name = name.replace('_', ' ')
-				file = os.path.join(target, attachments_dir, name)
+			if not os.path.exists(file):
+				if name.find('/') != -1:
+					name=name.replace('/','')
+					file = os.path.join(target, adir, name)
 
-		# our user actually also has attachments that have
-		# space characters in the file name where the file on
-		# disk has underscores.  if we didn't find the match
-		# after our last transform, try the rever
+			# our user also has attachments that have _ characters
+			# in the file name where the file on disk has spaces.
+			# translate that as well, if it would help.
 
-		if not os.path.exists(file):
-			if name.find(' ') != -1:
-				name = name.replace(' ', '_')
-				file = os.path.join(target, attachments_dir, name)
+			if not os.path.exists(file):
+				if name.find('_') != -1:
+					name = name.replace('_', ' ')
+					file = os.path.join(target, adir, name)
 
-		# in our user's attachments, we have some files named
-		# akin to 'filename.ppt 1' and so forth.  we're going
-		# to trim anything after the first whitespace
-		# character after the first . in the filename
+			# our user actually also has attachments that have
+			# space characters in the file name where the file on
+			# disk has underscores.  if we didn't find the match
+			# after our last transform, try the rever
 
-		cleaned_filename = re_filename_cleaner.sub( r'\1', file )
+			if not os.path.exists(file):
+				if name.find(' ') != -1:
+					name = name.replace(' ', '_')
+					file = os.path.join(target, adir, name)
 
-		mimeinfo = mimetypes.guess_type(cleaned_filename)
+	# in our user's attachments, we have some files named
+	# akin to 'filename.ppt 1' and so forth.  we're going
+	# to trim anything after the first whitespace
+	# character after the first . in the filename
 
-		if not os.path.exists(file):
-			if os.path.exists(cleaned_filename):
-				file = cleaned_filename
-			else:
-				file2 = file.replace('_', ' ')
-				cleaned_filename2 = re_filename_cleaner.sub( r'\1', file2)
-				if os.path.exists(cleaned_filename2):
-					file = cleaned_filename2
+	cleaned_filename = re_filename_cleaner.sub( r'\1', file )
 
-		print "File is %s [%s], mime info is %s" % (file, cleaned_filename, str(mimeinfo))
+	mimeinfo = mimetypes.guess_type(cleaned_filename)
 
-		if not mimeinfo[0]:
-			(mimetype, mimesubtype) = ('application', 'octet-stream')
+	if not os.path.exists(file):
+		if os.path.exists(cleaned_filename):
+			file = cleaned_filename
 		else:
-			(mimetype, mimesubtype) = mimeinfo[0].split('/')
+			file2 = file.replace('_', ' ')
+			cleaned_filename2 = re_filename_cleaner.sub( r'\1', file2)
+			if os.path.exists(cleaned_filename2):
+				file = cleaned_filename2
 
-		if os.path.isfile(file):
-			fp = open(file, 'rb')
+	print "File is %s [%s], mime info is %s" % (file, cleaned_filename, str(mimeinfo))
 
-			try:
-				if mimetype == 'application':
-					msg = MIMEApplication(fp.read(), _subtype=mimesubtype)
-				elif mimetype == 'image':
-					msg = MIMEImage(fp.read(), _subtype=mimesubtype)
-				elif mimetype == 'text':
-					msg = MIMEText(fp.read(), _subtype=mimesubtype)
-				elif mimetype == 'audio':
-					msg = MIMEAudio(fp.read(), _subtype=mimesubtype)
-				else:
-					EudoraLog.log.error("Unrecognized mime type '%s' while processing attachment '%s'" % (mimeinfo[0], file))
-					return
-			finally:
-				fp.close()
+	if not mimeinfo[0]:
+		(mimetype, mimesubtype) = ('application', 'octet-stream')
+	else:
+		(mimetype, mimesubtype) = mimeinfo[0].split('/')
 
-			msg.add_header('Content-Disposition', 'attachment', filename=name)
+	if os.path.isfile(file):
+		fp = open(file, 'rb')
 
-			message.attach(msg)
-
-			attachments_found = attachments_found + 1
-
-			EudoraLog.log.warn(" SUCCEEDED finding attachment: \'" + attachment_desc + "\', name = \'" + name + "\'")
-			if orig_path in paths_found:
-				paths_found[orig_path] = paths_found[orig_path] + 1
+		try:
+			if mimetype == 'application':
+				msg = MIMEApplication(fp.read(), _subtype=mimesubtype)
+			elif mimetype == 'image':
+				msg = MIMEImage(fp.read(), _subtype=mimesubtype)
+			elif mimetype == 'text':
+				msg = MIMEText(fp.read(), _subtype=mimesubtype)
+			elif mimetype == 'audio':
+				msg = MIMEAudio(fp.read(), _subtype=mimesubtype)
 			else:
-				paths_found[orig_path] = 1
+				EudoraLog.log.error("Unrecognized mime type '%s' while processing attachment '%s'" % (mimeinfo[0], file))
+				return
+		finally:
+			fp.close()
+
+		msg.add_header('Content-Disposition', 'attachment', filename=name)
+
+		message.attach(msg)
+
+		attachments_found = attachments_found + 1
+
+		EudoraLog.log.warn(" SUCCEEDED finding attachment: \'" + attachment_desc + "\', name = \'" + name + "\'")
+		if orig_path in paths_found:
+			paths_found[orig_path] = paths_found[orig_path] + 1
 		else:
-			attachments_missing = attachments_missing + 1
-			EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
+			paths_found[orig_path] = 1
+	else:
+		attachments_missing = attachments_missing + 1
+		EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
 
-			if orig_path in paths_missing:
-				paths_missing[orig_path] = paths_missing[orig_path] + 1
-			else:
-				paths_missing[orig_path] = 1
+		if orig_path in paths_missing:
+			paths_missing[orig_path] = paths_missing[orig_path] + 1
+		else:
+			paths_missing[orig_path] = 1
 
 #import profile
 # File argument (must be exactly 1).
