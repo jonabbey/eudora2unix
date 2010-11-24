@@ -61,6 +61,7 @@ from email.mime.nonmultipart import MIMENonMultipart
 from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
+from email.mime.audio import MIMEAudio
 from mailbox import mbox
 import mimetypes
 
@@ -538,16 +539,21 @@ def handle_attachment( line, target, attachments_dir, message ):
 		if os.path.isfile(file):
 			fp = open(file, 'rb')
 
-			if mimetype == 'application':
-				msg = MIMEApplication(fp.read(), _subtype=mimesubtype)
-			elif mimetype == 'image':
-				msg = MIMEImage(fp.read(), _subtype=mimesubtype)
-			elif mimetype == 'text':
-				msg = MIMEText(fp.read(), _subtype=mimesubtype)
-			else:
-				EudoraLog.log.error("Unrecognized mime type '%s' while processing attachment '%s'" % (mimestring, file))
+			try:
+				if mimetype == 'application':
+					msg = MIMEApplication(fp.read(), _subtype=mimesubtype)
+				elif mimetype == 'image':
+					msg = MIMEImage(fp.read(), _subtype=mimesubtype)
+				elif mimetype == 'text':
+					msg = MIMEText(fp.read(), _subtype=mimesubtype)
+				elif mimetype == 'audio':
+					msg = MIMEAudio(fp.read(), _subtype=mimesubtype)
+				else:
+					EudoraLog.log.error("Unrecognized mime type '%s' while processing attachment '%s'" % (mimeinfo[0], file))
+					return
+			finally:
+				fp.close()
 
-			fp.close()
 			msg.add_header('Content-Disposition', 'attachment', filename=name)
 
 			message.attach(msg)
