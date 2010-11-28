@@ -87,3 +87,6 @@ class Log:
 		self.record(self.mbxname + ERR_SFX, msg, 3)
 		self.error_msgs += 1
 		Log.exit_code = 1
+
+	def mbx_name(self):
+		return self.mbxname
