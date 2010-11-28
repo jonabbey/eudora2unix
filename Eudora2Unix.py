@@ -5,8 +5,8 @@ for either pine or kmail
 """
 __author__ = "Stevan White <Stevan_White@hotmail.com"
 __credits__ = "Based on Eudora2Unix.sh by Eric Maryniak"
-__date__ = "2003-04-29"
-__version__ = "1.3"
+__date__ = "2010-11-28"
+__version__ = "2.0"
 import sys
 import types
 import time
@@ -462,9 +462,12 @@ def convert_files( avoid_dirlist, dir, names ):
 	Analyze by diffing with (e.g. diff-ing against the .E2U_ORIG version).
 	"""
 	# avoid any directory specified with a '-a' flag
-#	for f, v in opts:
-#		if f == '-a' and samefile( dir, v ):
-#			return
+	for f, v in opts:
+		if f == '-a':
+			attachments_dirs = v.split(':')
+			for adir in attachments_dirs:
+				if samefile( dir, adir ):
+					return
 	descmap = parse_descmap( dir )
 	for f in names:
 		fpath = join( dir, f )
