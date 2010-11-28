@@ -142,6 +142,7 @@ attachments_found = 0
 attachments_missing = 0
 paths_found = {}
 paths_missing = {}
+missing_attachments = []
 
 def convert( mbx, opts = None ):
 	"""
@@ -429,6 +430,7 @@ def handle_attachment( line, target, attachments_dir, message ):
 
 	global attachments_listed, attachments_found, attachments_missing
 	global paths_found, paths_missing
+	global missing_attachments
 
 	attachments_listed = attachments_listed + 1
 
@@ -536,7 +538,7 @@ def handle_attachment( line, target, attachments_dir, message ):
 			if os.path.exists(cleaned_filename2):
 				file = cleaned_filename2
 
-	print "File is %s [%s], mime info is %s" % (file, cleaned_filename, str(mimeinfo))
+#	print "File is %s [%s], mime info is %s" % (file, cleaned_filename, str(mimeinfo))
 
 	if not mimeinfo[0]:
 		(mimetype, mimesubtype) = ('application', 'octet-stream')
@@ -547,7 +549,7 @@ def handle_attachment( line, target, attachments_dir, message ):
 		fp = open(file, 'rb')
 
 		try:
-			if mimetype == 'application':
+			if mimetype == 'application' or mimetype == 'video':
 				msg = MIMEApplication(fp.read(), _subtype=mimesubtype)
 			elif mimetype == 'image':
 				msg = MIMEImage(fp.read(), _subtype=mimesubtype)
@@ -567,14 +569,15 @@ def handle_attachment( line, target, attachments_dir, message ):
 
 		attachments_found = attachments_found + 1
 
-		EudoraLog.log.warn(" SUCCEEDED finding attachment: \'" + attachment_desc + "\', name = \'" + name + "\'")
+#		EudoraLog.log.warn(" SUCCEEDED finding attachment: \'" + attachment_desc + "\', name = \'" + name + "\'")
 		if orig_path in paths_found:
 			paths_found[orig_path] = paths_found[orig_path] + 1
 		else:
 			paths_found[orig_path] = 1
 	else:
 		attachments_missing = attachments_missing + 1
-		EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
+		missing_attachments.append((EudoraLog.log, attachment_desc));
+#		EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
 
 		if orig_path in paths_missing:
 			paths_missing[orig_path] = paths_missing[orig_path] + 1
