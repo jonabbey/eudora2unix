@@ -142,7 +142,7 @@ attachments_found = 0
 attachments_missing = 0
 paths_found = {}
 paths_missing = {}
-missing_attachments = []
+missing_attachments = {}
 
 def convert( mbx, opts = None ):
 	"""
@@ -469,8 +469,8 @@ def handle_attachment( line, target, attachments_dir, message ):
 		name = dlist.pop().strip()	# pop off last portion of name
 		orig_path = "/".join(dlist)
 	else:
-		EudoraLog.log.warn( "FAILED to convert attachment: \'"
-				    + attachment_desc + "\'" )
+#		EudoraLog.log.warn( "FAILED to convert attachment: \'"
+#				    + attachment_desc + "\'" )
 		name = attachment_desc
 		orig_path = attachment_desc
 
@@ -576,7 +576,11 @@ def handle_attachment( line, target, attachments_dir, message ):
 			paths_found[orig_path] = 1
 	else:
 		attachments_missing = attachments_missing + 1
-		missing_attachments.append((EudoraLog.log, attachment_desc));
+
+		if not EudoraLog.log.mbx_name in missing_attachments:
+			missing_attachments[EudoraLog.log.mbx_name] = []
+		missing_attachments[EudoraLog.log.mbx_name].append(attachment_desc)
+
 #		EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
 
 		if orig_path in paths_missing:
