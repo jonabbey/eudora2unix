@@ -55,6 +55,7 @@ import sys
 import string
 import getopt
 import urllib
+import traceback
 from email import message, encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.nonmultipart import MIMENonMultipart
@@ -121,7 +122,7 @@ exit_code = 0	# exit code: 0 if all ok, 1 if any warnings or errors
 
 re_quoted_attachment = re.compile( r'^Attachment converted: "([^"]*)"\s*$', re.IGNORECASE )
 re_attachment = re.compile( r'^Attachment converted: (.*)$', re.IGNORECASE )
-re_multi_contenttype = re.compile( r'^multipart/([^;]+);.*', re.IGNORECASE )
+re_multi_contenttype = re.compile( r'multipart/([^;]+);.*', re.IGNORECASE )
 re_single_contenttype = re.compile( r'^([^;]+);?.*', re.IGNORECASE )
 re_charset_contenttype = re.compile( r'charset="([^"]+)"', re.IGNORECASE )
 re_boundary_contenttype = re.compile( r'boundary="([^"]+)"', re.IGNORECASE )
@@ -222,6 +223,7 @@ def convert( mbx, opts = None ):
 	msg_lines = []
 	attachments = []
 	is_html = False
+	attachments_ok = False
 
 	# Main loop, that reads the mailbox file and converts.
 	#
@@ -260,9 +262,28 @@ def convert( mbx, opts = None ):
 					for aline, atarget in attachments:
 						handle_attachment( aline, atarget, attachments_dir, message )
 
-				newmailbox.add(message)
+				try:
+					newmailbox.add(message)
+				except Exception, e:
+					print "\nHEY message = " + str(msg_text) + "\n"
+					print "Type of message's payload is " + str(type(message.get_payload())) + "\n"
+					if isinstance( message.get_payload(), list ):
+						print "Size of message's payload list is " + str(len(message.get_payload())) + "\n"
+						print ")))))))))))))))))))) First part"
+						print str(message.get_payload()[0])
+						print ">>>>>>>>>>>>>>>>>>>> Second part"
+						print str(message.get_payload()[1])
 
-				print ".", 
+					print "attachments_contenttype is (%s)" % (attachments_contenttype, )
+					print "attachments_ok is (%s)" % (attachments_ok, )
+
+					if attachments:
+						print "Yeah, attachments were found: %d" % (len(attachments), )
+
+					print "EXCEPTION " + str(e) + "\n"
+					traceback.print_exc(file=sys.stdout)
+
+#				print ".", 
 
 			if headers:
 				# Error
@@ -301,19 +322,31 @@ def convert( mbx, opts = None ):
 
 					if not contenttype:
 						message = MIMENonMultipart('text', 'plain')
+						attachments_ok = False
+						attachments_contenttype = False
+#						print "T",
 					elif not re_multi_contenttype.search( contenttype ):
 						if re_single_contenttype.search ( contenttype ):
 							mimetype = re_single_contenttype.sub( r'\1', contenttype )
 							(main, slash, sub) = mimetype.partition( '/' )
 							message = MIMENonMultipart(main, sub)
+							attachments_ok = False
+							attachments_contenttype = False
+#							print "X",
 						else:
 							print "*** %s" % (contenttype,)
 					else:
 						subtype = re_multi_contenttype.search( contenttype )
 						if subtype:
 							message = MIMEMultipart(_subtype=subtype.group(1))
+							attachments_ok = subtype.group(1)
+							attachments_contenttype = contenttype
+#							print "Y",
 						else:
 							message = MIMEMultipart()
+#							print "Z",
+							attachments_ok = "Dunno"
+							attachments_contenttype = "Still Dunno"
 
 					# set all the headers we've seen
 
