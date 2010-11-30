@@ -321,10 +321,17 @@ def convert( mbx, opts = None ):
 					contenttype = headers.getValue('Content-Type:')
 
 					if not contenttype:
-						message = MIMENonMultipart('text', 'plain')
-						attachments_ok = False
-						attachments_contenttype = False
-#						print "T",
+						msattach = headers.getValue('X-MS-Attachment:')
+
+						if msattach:
+							message = MIMEMultipart()
+							attachments_ok = "Dunno"
+							attachments_contenttype = "Still Dunno"
+						else:
+							message = MIMENonMultipart('text', 'plain')
+							attachments_ok = False
+							attachments_contenttype = False
+#							print "T",
 					elif not re_multi_contenttype.search( contenttype ):
 						if re_single_contenttype.search ( contenttype ):
 							mimetype = re_single_contenttype.sub( r'\1', contenttype )
