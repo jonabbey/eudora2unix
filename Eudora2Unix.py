@@ -496,8 +496,10 @@ def convert_files( avoid_dirlist, dir, names ):
 
 			print "------Hey, I'm moving %s to %s\n" % (file1, file2)
 			moveFile( f_nombx + ".new", f_nombx )
-			removeFile( f_nombx + ".toc" )
-			removeFile( f_nombx + ".toc.txt" )
+
+			if exists( f_nombx + ".toc" ):
+				removeFile( f_nombx + ".toc" )
+				removeFile( f_nombx + ".toc.txt" )
 			print
 
 def parse_descmap( dir ):
