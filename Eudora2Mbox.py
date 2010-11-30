@@ -552,75 +552,73 @@ def handle_attachment( line, target, attachments_dir, message ):
 		return
 
 	attachments_dirs = attachments_dir.split(':')
-	file = None
+	filename = None
 
 	for adir in attachments_dirs:
-		if not file or not os.path.exists(file):
-			file = os.path.join( target, adir, name )
+		if not filename or not os.path.exists(filename):
+			filename = os.path.join( target, adir, name )
 			if not os.path.isabs( target ):
-				file = os.path.join( os.environ['HOME'], file )
+				filename = os.path.join( os.environ['HOME'], filename )
 
-			if not os.path.exists(file):
+			if not os.path.exists(filename):
 				if name.startswith('OutboundG4:'):
 					name = name[11:]
 					print "**** Hey, name is now %s" % (name, )
-					file = os.path.join(target, attachments_dir, name)
+					filename = os.path.join(target, attachments_dir, name)
 
 			# our user has attachments that have / characters in
 			# the file name, but when they got copied over to
 			# unix, the / chars were taken out, if it would help.
 
-			if not os.path.exists(file):
+			if not os.path.exists(filename):
 				if name.find('/') != -1:
 					name=name.replace('/','')
-					file = os.path.join(target, adir, name)
+					filename = os.path.join(target, adir, name)
 
 			# our user also has attachments that have _ characters
 			# in the file name where the file on disk has spaces.
 			# translate that as well, if it would help.
 
-			if not os.path.exists(file):
+			if not os.path.exists(filename):
 				if name.find('_') != -1:
 					name = name.replace('_', ' ')
-					file = os.path.join(target, adir, name)
+					filename = os.path.join(target, adir, name)
 
 			# our user actually also has attachments that have
 			# space characters in the file name where the file on
 			# disk has underscores.  if we didn't find the match
 			# after our last transform, try the rever
 
-			if not os.path.exists(file):
+			if not os.path.exists(filename):
 				if name.find(' ') != -1:
 					name = name.replace(' ', '_')
-					file = os.path.join(target, adir, name)
+					filename = os.path.join(target, adir, name)
 
 	# in our user's attachments, we have some files named
 	# akin to 'filename.ppt 1' and so forth.  we're going
 	# to trim anything after the first whitespace
 	# character after the first . in the filename
 
-	cleaned_filename = re_filename_cleaner.sub( r'\1', file )
+	cleaner_match = re_filename_cleaner.match( filename )
 
-	mimeinfo = mimetypes.guess_type(cleaned_filename)
+	if cleaner_match:
+		filename = cleaner_match.group(1)
 
-	if not os.path.exists(file):
-		if os.path.exists(cleaned_filename):
-			file = cleaned_filename
-		else:
-			file2 = file.replace('_', ' ')
-			cleaned_filename2 = re_filename_cleaner.sub( r'\1', file2)
-			if os.path.exists(cleaned_filename2):
-				file = cleaned_filename2
+	mimeinfo = mimetypes.guess_type(filename)
 
-#	print "File is %s [%s], mime info is %s" % (file, cleaned_filename, str(mimeinfo))
+	if not os.path.exists(filename):
+		cleaner_match = re_filename_cleaner.match(filename.replace('_', ' '))
+
+		if cleaner_match and os.path.exists(cleaner_match.group(1)):
+			filename = cleaner_match.group(1)
 
 	if not mimeinfo[0]:
 		(mimetype, mimesubtype) = ('application', 'octet-stream')
 	else:
 		(mimetype, mimesubtype) = mimeinfo[0].split('/')
 
-	if os.path.isfile(file):
-		fp = open(file, 'rb')
+	if os.path.isfile(filename):
+		fp = open(filename, 'rb')
 
 		try:
 			if mimetype == 'application' or mimetype == 'video':
@@ -632,7 +630,7 @@ def handle_attachment( line, target, attachments_dir, message ):
 			elif mimetype == 'audio':
 				msg = MIMEAudio(fp.read(), _subtype=mimesubtype)
 			else:
-				EudoraLog.log.error("Unrecognized mime type '%s' while processing attachment '%s'" % (mimeinfo[0], file))
+				EudoraLog.log.error("Unrecognized mime type '%s' while processing attachment '%s'" % (mimeinfo[0], filename))
 				return
 		finally:
 			fp.close()
