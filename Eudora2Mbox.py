@@ -144,6 +144,7 @@ attachments_missing = 0
 paths_found = {}
 paths_missing = {}
 missing_attachments = {}
+found_attachments = {}
 
 def convert( mbx, opts = None ):
 	"""
@@ -503,7 +504,7 @@ def handle_attachment( line, target, attachments_dir, message ):
 
 	global attachments_listed, attachments_found, attachments_missing
 	global paths_found, paths_missing
-	global missing_attachments
+	global missing_attachments, found_attachments
 
 	attachments_listed = attachments_listed + 1
 
@@ -647,6 +648,10 @@ def handle_attachment( line, target, attachments_dir, message ):
 			paths_found[orig_path] = paths_found[orig_path] + 1
 		else:
 			paths_found[orig_path] = 1
+
+		if not EudoraLog.log.mbx_name in found_attachments:
+			found_attachments[EudoraLog.log.mbx_name] = []
+		found_attachments[EudoraLog.log.mbx_name].append((attachment_desc, filename))
 	else:
 		attachments_missing = attachments_missing + 1
 

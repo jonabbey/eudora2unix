@@ -343,7 +343,29 @@ def convert_directory( eudoradir, opts ):
 	if not isMac:
 		inform( windows_concluding_remarks() )
 	inform( concluding_remarks( target, targetdir ) )
+
+	show_attachment_stats()
+
 	sys.exit( 0 )
+
+def show_attachment_stats():
+	print "\n------------------------------------------------------------------------------------------------------------------------\n"
+        print "\n                                                 FOUND FOUND FOUND\n"
+
+	for k, v in Eudora2Mbox.found_attachments:
+		print k
+		for (desc, filename) in v:
+			print "\t%s -- %s" % (desc, filename)
+		print
+
+	print "\n------------------------------------------------------------------------------------------------------------------------\n"
+        print "\n                                                 MISSING MISSING MISSING\n"
+
+	for k, v in Eudora2Mbox.missing_attachments:
+		print k
+		for (desc, filename) in v:
+			print "\t%s -- %s" % (desc, filename)
+		print
 
 def execute_user_pre_script( local_script_path, maildir ):
 	""" User-specific pre-actions first.  Add your hook here.
