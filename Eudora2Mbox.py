@@ -309,9 +309,9 @@ def convert( mbx, opts = None ):
 						else:
 							print "*** %s" % (contenttype,)
 					else:
-						subtype = re_multi_contenttype.sub( r'\1', contenttype )
+						subtype = re_multi_contenttype.search( contenttype )
 						if subtype:
-							message = MIMEMultipart(_subtype=subtype)
+							message = MIMEMultipart(_subtype=subtype.group(1))
 						else:
 							message = MIMEMultipart()
 
@@ -343,7 +343,7 @@ def convert( mbx, opts = None ):
 					# Eudora inserts before the
 					# 'Attachment Converted' line.
 
-					if msg_lines[-1] == '\n' or msg_lines[-1] == '\r\n':
+					if len(msg_lines) > 0 and (msg_lines[-1] == '\n' or msg_lines[-1] == '\r\n'):
 						msg_lines.pop()
 
 					#EudoraLog.log.warn("Adding attachment with contenttype = " + contenttype)
