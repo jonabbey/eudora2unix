@@ -68,6 +68,9 @@ def cannot_open_complaint( fpath, strerror ):
 def cannot_move_complaint( src, dst, strerror ):
 	return "Cannot move '" + src + "' to '" + dst + "' : " + strerror
 
+def cannot_remove_complaint( filename, strerror ):
+	return "Cannot delete '" + filename + "' : " + strerror
+
 def cannot_copy_complaint( f, dst, strerror ):
 	return "Cannot copy '" + f + "' to '" + dst + f + "' : " + strerror 
 
@@ -488,8 +491,13 @@ def convert_files( avoid_dirlist, dir, names ):
 					complain( toc_complaint( f_toc, str ) )
 			moveFile( fpath, f_nombx )
 			Eudora2Mbox.convert( f_nombx, opts )
-			moveFile( f_nombx, f_orig )
-			moveFile( f_nombx + OUT_SFX, f_targ )
+			file1 = f_nombx + ".new"
+			file2 = f_nombx
+
+			print "------Hey, I'm moving %s to %s\n" % (file1, file2)
+			moveFile( f_nombx + ".new", f_nombx )
+			removeFile( f_nombx + ".toc" )
+			removeFile( f_nombx + ".toc.txt" )
 			print
 
 def parse_descmap( dir ):
@@ -525,6 +533,13 @@ def moveFile( src, dst ):
 		os.rename( src, dst )
 	except OSError, ( errno, strerror ):
 		exit_msg( cannot_move_complaint( src, dst, strerror ) )
+
+def removeFile( filename ):
+	try:
+		os.remove( filename )
+	except OSError, ( errno, strerror ):
+		exit_msg( cannot_remove_complaint( filename, strerror ) )
+
 # We now have all Eudora mailboxes (*.mbx with .mbx extension removed)
 # properly processed in Eudora folders (*.fol).
 
