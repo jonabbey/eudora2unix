@@ -145,7 +145,7 @@ class TOC_Info:
 
 		except IOError, ( errno, strerror ):
 			self.info = None
-			if verbose >= 0:
+			if EudoraLog.verbose >= 0:
 				print( "Couldn't read parsed .toc file '" 
 					+ toc_file_name + "': " + strerror )
 
