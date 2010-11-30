@@ -254,7 +254,27 @@ def convert( mbx, opts = None ):
 					if is_html:
 						message.attach(MIMEText(msg_text, _subtype='html'))
 					else:
-						message.attach(MIMEText(msg_text))
+						try:
+							message.attach(MIMEText(msg_text))
+						except Exception, e:
+							print "\nHEY HEY HEY message = " + str(msg_text) + "\n"
+							print "Type of message's payload is " + str(type(message.get_payload())) + "\n"
+							if isinstance( message.get_payload(), list ):
+								print "Size of message's payload list is " + str(len(message.get_payload())) + "\n"
+								print ")))))))))))))))))))) First part"
+								print str(message.get_payload()[0])
+								print ">>>>>>>>>>>>>>>>>>>> Second part"
+								print str(message.get_payload()[1])
+
+							print "attachments_contenttype is (%s)" % (attachments_contenttype, )
+							print "attachments_ok is (%s)" % (attachments_ok, )
+
+							if attachments:
+								print "Yeah, attachments were found: %d" % (len(attachments), )
+
+							print "EXCEPTION " + str(e) + "\n"
+							traceback.print_exc(file=sys.stdout)
+
 				else:
 					message.set_payload(msg_text)
 
