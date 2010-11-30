@@ -349,23 +349,33 @@ def convert_directory( eudoradir, opts ):
 	sys.exit( 0 )
 
 def show_attachment_stats():
-	print "\n------------------------------------------------------------------------------------------------------------------------\n"
-        print "\n                                                 FOUND FOUND FOUND\n"
 
-	for k, v in Eudora2Mbox.found_attachments:
-		print k
-		for (desc, filename) in v:
-			print "\t%s -- %s" % (desc, filename)
-		print
+	common_names = set()
+	common_names.add(Eudora2Mbox.found_attachments.keys())
+	common_names.add(Eudora2Mbox.misisng_attachments.keys())
 
 	print "\n------------------------------------------------------------------------------------------------------------------------\n"
-        print "\n                                                 MISSING MISSING MISSING\n"
 
-	for k, v in Eudora2Mbox.missing_attachments:
+	for k in common_names:
+		print "\n--------------------\n"
 		print k
-		for (desc, filename) in v:
-			print "\t%s -- %s" % (desc, filename)
-		print
+
+		if k in Eudora2Mbox.found_attachments:
+			print "Found Attachments:\n"
+			print "==================\n"
+
+			for (desc, filename) in Eudora2Mbox.found_attachments[k]:
+				print "\t%s -- %s" % (desc, filename)
+
+			print
+		if k in Eudora2Mbox.missing_attachments:
+			print "Missing Attachments:\n"
+			print "====================\n"
+
+			for desc in Eudora2Mbox.missing_attachments[k]:
+				print "\t%s -- %s" % (desc, filename)
+
+			print
 
 def execute_user_pre_script( local_script_path, maildir ):
 	""" User-specific pre-actions first.  Add your hook here.
