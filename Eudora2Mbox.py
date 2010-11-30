@@ -196,6 +196,7 @@ def convert( mbx, opts = None ):
 	EudoraLog.line_no	= 0	# line number of current line record (for messages)
 
 	headers = None
+	in_headers = False
 	last_file_position = 0
 	msg_offset = 0
 
@@ -251,6 +252,15 @@ def convert( mbx, opts = None ):
 				msg_text = ''.join(msg_lines)
 
 				if attachments:
+					if not isinstance( message, MIMEMultipart):
+						print "\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
+						print "Forcing surprise multipart!\n"
+						print "\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
+
+						message = MIMEMultipart()
+
+						set_headers( message, headers )
+
 					if is_html:
 						message.attach(MIMEText(msg_text, _subtype='html'))
 					else:
@@ -305,7 +315,7 @@ def convert( mbx, opts = None ):
 
 #				print ".", 
 
-			if headers:
+			if in_headers:
 				# Error
 				#
 				# We have a "From " line while already 
@@ -322,10 +332,11 @@ def convert( mbx, opts = None ):
 			msg_offset = last_file_position
 			headers = Header()
 			headers.add( 'From ', line[5:].strip() )
+			in_headers = True
 			is_html = False
 			EudoraLog.msg_no += 1
 		else:
-			if headers:
+			if in_headers:
 				if re_initial_whitespace.match( line ):
 					# Header "folding" (RFC 2822 3.2.3)
 					headers.appendToLast( line )
@@ -379,16 +390,9 @@ def convert( mbx, opts = None ):
 
 					headers.clean(toc_info, msg_offset, replies)
 
-					for header, value in headers:
-						if header != 'From ' and not re_contenttype.match( header ):
-							newheader = header[:-1]
-							message[newheader] = value
+					set_headers( message, headers )
 
-					myfrom = headers.getValue('From ')
-
-					message.set_unixfrom('From ' + headers.getValue('From '))
-
-					headers = None
+					in_headers = False
 
 					msg_lines = []
 					attachments = []
@@ -466,6 +470,15 @@ def convert( mbx, opts = None ):
 
 	return 0
 
+def set_headers( message, headers):
+	for header, value in headers:
+		if header != 'From ' and not re_contenttype.match( header ):
+			newheader = header[:-1]
+			message[newheader] = value
+
+	myfrom = headers.getValue('From ')
+					
+	message.set_unixfrom('From ' + myfrom)
 
 def handle_attachment( line, target, attachments_dir, message ):
 	"""
