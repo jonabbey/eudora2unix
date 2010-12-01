@@ -351,8 +351,8 @@ def convert_directory( eudoradir, opts ):
 def show_attachment_stats():
 
 	common_names = set()
-	common_names.add(Eudora2Mbox.found_attachments.keys())
-	common_names.add(Eudora2Mbox.misisng_attachments.keys())
+	common_names = common_names.union(Eudora2Mbox.found_attachments.keys())
+	common_names = common_names.union(Eudora2Mbox.missing_attachments.keys())
 
 	print "\n------------------------------------------------------------------------------------------------------------------------\n"
 
