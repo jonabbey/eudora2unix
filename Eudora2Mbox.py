@@ -184,12 +184,13 @@ def convert( mbx, opts = None ):
 		EudoraLog.fatal( P + ': usage: Eudora2Mbox.py eudora-mailbox-file.mbx' )
 		return 0
 
-	attachments_dir = None
+	attachments_dirs = []
 	target = ''
 	if opts:
 		for f, v in opts:
 			if f == '-a':
-				attachments_dir = v
+				attachments_dirs = v.split(':')
+
 			elif f == '-t':
 				target = v
 
@@ -291,7 +292,7 @@ def convert( mbx, opts = None ):
 
 				if attachments:
 					for aline, atarget in attachments:
-						handle_attachment( aline, atarget, attachments_dir, message )
+						handle_attachment( aline, atarget, attachments_dirs, message )
 
 				try:
 					newmailbox.add(message)
@@ -403,7 +404,7 @@ def convert( mbx, opts = None ):
 				if re_xhtml.search ( line ):
 					is_html = True
 				
-				if attachments_dir and re_attachment.search( line ):
+				if attachments_dirs and re_attachment.search( line ):
 					# remove the newline that
 					# Eudora inserts before the
 					# 'Attachment Converted' line.
@@ -481,7 +482,7 @@ def set_headers( message, headers):
 					
 	message.set_unixfrom('From ' + myfrom)
 
-def handle_attachment( line, target, attachments_dir, message ):
+def handle_attachment( line, target, attachments_dirs, message ):
 	"""
 	Mac versions put "Attachment converted", Windows (Lite) has
 	"Attachment Converted". 
@@ -496,7 +497,7 @@ def handle_attachment( line, target, attachments_dir, message ):
 	(Lite version uses 8-char filenames)
 	
 	This replaces that filepath with a file URI to the file in the
-	attachments_dir directory.  This has no direct effect in Kmail, but 
+	attachments_dirs directories.  This has no direct effect in Kmail, but 
 	sometimes Pine can open the file (so long as there aren't any 
 	spaces in the filepath).  At least it makes more sense than
 	leaving the old filepath.
@@ -551,7 +552,6 @@ def handle_attachment( line, target, attachments_dir, message ):
 	if len( name ) <= 0:
 		return
 
-	attachments_dirs = attachments_dir.split(':')
 	filename = None
 
 	for adir in attachments_dirs:

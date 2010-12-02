@@ -35,6 +35,9 @@ re_in = re.compile( 'in\.mbx', re.IGNORECASE )
 re_out = re.compile( 'out\.mbx', re.IGNORECASE )
 re_trash = re.compile( 'trash\.mbx', re.IGNORECASE )
 isMac = False;	# global for convert_files
+
+attachments_not_handled = set()
+
 # --------------------- Comments & complaints ----------------------
 def usage_complaint( arg ):
 	return [
@@ -253,11 +256,14 @@ def convert_directory( eudoradir, opts ):
 
 	target = 'pine'
 	targetdir = ''
+	attachments_dirs = []
 	for f, v in opts:
 		if f == '-t':
 			target = v.strip().lower()
 		elif f == '-d':
 			targetdir = v.strip()
+		elif f == '-a':
+			attachments_dirs = v.strip().split(':')
 	if targetdir == '':
 		if target == 'kmail':
 			targetdir = 'Mail'
@@ -271,6 +277,9 @@ def convert_directory( eudoradir, opts ):
 		maildir = targetdir
 	else:
 		maildir = join( os.environ['HOME'], targetdir + '.e2u' )
+
+	if attachments_dirs:
+		scan_attachment_dirs(attachments_dirs)
 
 	maildirLENGTH = len( maildir )
 
@@ -348,7 +357,16 @@ def convert_directory( eudoradir, opts ):
 
 	sys.exit( 0 )
 
+def scan_attachment_dirs(attachments_dirs):
+	global attachments_not_handled
+
+	for adir in attachments_dirs:
+		fullpaths = [adir + "/" + dirname for dirname in os.listdir(adir)]
+		attachments_not_handled = attachments_not_handled.union(fullpaths)
+
 def show_attachment_stats():
+
+	global attachments_not_handled
 
 	common_names = set()
 	common_names = common_names.union(Eudora2Mbox.found_attachments.keys())
@@ -362,24 +380,37 @@ def show_attachment_stats():
 		for k in common_names:
 			OUT.write("\n--------------------\n")
 			OUT.write(k)
-			OUT.write("\n")
+			OUT.write("\n\n")
 
 			if k in Eudora2Mbox.found_attachments:
-				OUT.write("Found Attachments:\n")
-				OUT.write("==================\n")
+#				OUT.write("Found Attachments:\n")
+#				OUT.write("==================\n")
 
 				for (desc, filename) in Eudora2Mbox.found_attachments[k]:
-					OUT.write("\t%s -- %s\n" % (desc, filename))
+					try:
+						attachments_not_handled.remove(filename)
+					except KeyError:
+						OUT.write("\tCouldn't find " + filename + " in attachments_not_handled\n")
+#					OUT.write("\t%s -- %s\n" % (desc, filename))
 
 				OUT.write("\n")
 			if k in Eudora2Mbox.missing_attachments:
 				OUT.write("Missing Attachments:\n")
 				OUT.write("====================\n")
 
+				i = 0
 				for desc in Eudora2Mbox.missing_attachments[k]:
-					OUT.write("\t%s\n" % (desc, ))
+					OUT.write("\t%d.   %s\n" % (i, desc))
+					i = i+1
 
 			OUT.write("\n")
+
+		OUT.write("\n------------------------------------------------------------------------------------------------------------------------\n")
+		OUT.write("                                           Attachment files not used\n\n")
+		i = 0
+		for filename in attachments_not_handled:
+			OUT.write(str(i) + ".   " + filename + "\n")
+			i = i+1
 	finally:
 		OUT.close()
 
