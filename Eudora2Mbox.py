@@ -647,15 +647,15 @@ def handle_attachment( line, target, attachments_dir, message ):
 		else:
 			paths_found[orig_path] = 1
 
-		if not EudoraLog.log.mbx_name in found_attachments:
-			found_attachments[EudoraLog.log.mbx_name] = []
-		found_attachments[EudoraLog.log.mbx_name].append((attachment_desc, filename))
+		if not EudoraLog.log.mbx_name() in found_attachments:
+			found_attachments[EudoraLog.log.mbx_name()] = []
+		found_attachments[EudoraLog.log.mbx_name()].append((attachment_desc, filename))
 	else:
 		attachments_missing = attachments_missing + 1
 
-		if not EudoraLog.log.mbx_name in missing_attachments:
-			missing_attachments[EudoraLog.log.mbx_name] = []
-		missing_attachments[EudoraLog.log.mbx_name].append(attachment_desc)
+		if not EudoraLog.log.mbx_name() in missing_attachments:
+			missing_attachments[EudoraLog.log.mbx_name()] = []
+		missing_attachments[EudoraLog.log.mbx_name()].append(attachment_desc)
 
 #		EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
 

@@ -354,28 +354,34 @@ def show_attachment_stats():
 	common_names = common_names.union(Eudora2Mbox.found_attachments.keys())
 	common_names = common_names.union(Eudora2Mbox.missing_attachments.keys())
 
-	print "\n------------------------------------------------------------------------------------------------------------------------\n"
+	OUT = open ( "/VOLUMES/huckabay/attachlog.txt", 'w')
 
-	for k in common_names:
-		print "\n--------------------\n"
-		print k
+	try:
+		OUT.write("\n------------------------------------------------------------------------------------------------------------------------\n")
 
-		if k in Eudora2Mbox.found_attachments:
-			print "Found Attachments:\n"
-			print "==================\n"
+		for k in common_names:
+			OUT.write("\n--------------------\n")
+			OUT.write(k)
+			OUT.write("\n")
 
-			for (desc, filename) in Eudora2Mbox.found_attachments[k]:
-				print "\t%s -- %s" % (desc, filename)
+			if k in Eudora2Mbox.found_attachments:
+				OUT.write("Found Attachments:\n")
+				OUT.write("==================\n")
 
-			print
-		if k in Eudora2Mbox.missing_attachments:
-			print "Missing Attachments:\n"
-			print "====================\n"
+				for (desc, filename) in Eudora2Mbox.found_attachments[k]:
+					OUT.write("\t%s -- %s\n" % (desc, filename))
 
-			for desc in Eudora2Mbox.missing_attachments[k]:
-				print "\t%s -- %s" % (desc, filename)
+				OUT.write("\n")
+			if k in Eudora2Mbox.missing_attachments:
+				OUT.write("Missing Attachments:\n")
+				OUT.write("====================\n")
 
-			print
+				for desc in Eudora2Mbox.missing_attachments[k]:
+					OUT.write("\t%s\n" % (desc, ))
+
+			OUT.write("\n")
+	finally:
+		OUT.close()
 
 def execute_user_pre_script( local_script_path, maildir ):
 	""" User-specific pre-actions first.  Add your hook here.
