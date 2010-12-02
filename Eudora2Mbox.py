@@ -120,6 +120,8 @@ P = sys.argv[0]
 
 exit_code = 0	# exit code: 0 if all ok, 1 if any warnings or errors
 
+message_count = 0
+
 re_quoted_attachment = re.compile( r'^Attachment converted: "([^"]*)"\s*$', re.IGNORECASE )
 re_attachment = re.compile( r'^Attachment converted: (.*)$', re.IGNORECASE )
 re_multi_contenttype = re.compile( r'multipart/([^;]+);.*', re.IGNORECASE )
@@ -172,7 +174,7 @@ def convert( mbx, opts = None ):
 
 	global attachments_listed, attachments_found, attachments_missing
 
-	global paths_found, paths_missing
+	global paths_found, paths_missing, message_count
 	
 	attachments_listed = 0
 	attachments_found = 0
@@ -295,6 +297,7 @@ def convert( mbx, opts = None ):
 						handle_attachment( aline, atarget, attachments_dirs, message )
 
 				try:
+					message_count = message_count + 1
 					newmailbox.add(message)
 				except Exception, e:
 					print "\nHEY message = " + str(msg_text) + "\n"

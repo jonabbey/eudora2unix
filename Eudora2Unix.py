@@ -37,6 +37,7 @@ re_trash = re.compile( 'trash\.mbx', re.IGNORECASE )
 isMac = False;	# global for convert_files
 
 attachments_not_handled = set()
+attachments_handled_by = {}
 
 # --------------------- Comments & complaints ----------------------
 def usage_complaint( arg ):
@@ -366,51 +367,68 @@ def scan_attachment_dirs(attachments_dirs):
 
 def show_attachment_stats():
 
-	global attachments_not_handled
+	global attachments_not_handled, attachments_handled_by
 
 	common_names = set()
 	common_names = common_names.union(Eudora2Mbox.found_attachments.keys())
 	common_names = common_names.union(Eudora2Mbox.missing_attachments.keys())
 
+	total_missing = 0
+	total_attachments_listed = 0
+	total_attachments_found = 0
+
 	OUT = open ( "/VOLUMES/huckabay/attachlog.txt", 'w')
 
 	try:
-		OUT.write("\n------------------------------------------------------------------------------------------------------------------------\n")
-
 		for k in common_names:
 			OUT.write("\n--------------------\n")
 			OUT.write(k)
 			OUT.write("\n\n")
 
 			if k in Eudora2Mbox.found_attachments:
-#				OUT.write("Found Attachments:\n")
-#				OUT.write("==================\n")
+#				OUT.write("\tFound Attachments:\n")
+#				OUT.write("\t==================\n")
 
+				writenewline = False
 				for (desc, filename) in Eudora2Mbox.found_attachments[k]:
+					total_attachments_listed = total_attachments_listed + 1
+					total_attachments_found = total_attachments_found + 1
 					try:
 						attachments_not_handled.remove(filename)
+						attachments_handled_by[filename] = k
 					except KeyError:
-						OUT.write("\tCouldn't find " + filename + " in attachments_not_handled\n")
+						OUT.write("\tAttachment " + filename + " was already used by " + k + "\n")
+						total_attachments_found = total_attachments_found - 1
+						writenewline = True
 #					OUT.write("\t%s -- %s\n" % (desc, filename))
 
-				OUT.write("\n")
+				if writenewline:
+					OUT.write("\n")
 			if k in Eudora2Mbox.missing_attachments:
-				OUT.write("Missing Attachments:\n")
-				OUT.write("====================\n")
+				OUT.write("\tMissing Attachments:\n")
+				OUT.write("\t====================\n")
 
-				i = 0
+				i = 1
 				for desc in Eudora2Mbox.missing_attachments[k]:
 					OUT.write("\t%d.   %s\n" % (i, desc))
 					i = i+1
+					total_missing = total_missing + 1
+					total_attachments_listed = total_attachments_listed + 1
 
 			OUT.write("\n")
 
 		OUT.write("\n------------------------------------------------------------------------------------------------------------------------\n")
 		OUT.write("                                           Attachment files not used\n\n")
-		i = 0
+		i = 1
 		for filename in attachments_not_handled:
 			OUT.write(str(i) + ".   " + filename + "\n")
 			i = i+1
+
+		OUT.write("\n\n                         Total Number of Messages Processed: " + str(Eudora2Mbox.message_count) + "\n")
+		OUT.write("                         Total Number of Attachments Referenced: " + str(total_attachments_listed) + "\n")
+		OUT.write("                         Total Number of Attachments Successfully Found: " + str(total_attachments_found) + "\n")
+		OUT.write("                         Total Count of Attachments Referenced in Email That Are Missing : " + str(total_missing) + "\n")
+		OUT.write("------------------------------------------------------------------------------------------------------------------------\n")
 	finally:
 		OUT.close()
 
