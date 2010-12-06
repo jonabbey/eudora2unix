@@ -124,6 +124,7 @@ message_count = 0
 
 re_quoted_attachment = re.compile( r'^Attachment converted: "([^"]*)"\s*$', re.IGNORECASE )
 re_attachment = re.compile( r'^Attachment converted: (.*)$', re.IGNORECASE )
+re_embedded = re.compile( r'^Embedded Content: ([^:]+):.*' )
 re_multi_contenttype = re.compile( r'multipart/([^;]+);.*', re.IGNORECASE )
 re_single_contenttype = re.compile( r'^([^;]+);?.*', re.IGNORECASE )
 re_charset_contenttype = re.compile( r'charset="([^"]+)"', re.IGNORECASE )
@@ -227,6 +228,7 @@ def convert( mbx, opts = None ):
 
 	msg_lines = []
 	attachments = []
+	embeddeds = []
 	is_html = False
 	attachments_ok = False
 
@@ -254,6 +256,22 @@ def convert( mbx, opts = None ):
 		if line.find( 'Find ', 0, 5 ) and re_message_start.match( line ):
 			if msg_lines:
 				msg_text = ''.join(msg_lines)
+
+				# Need to add support here for processing embeddeds
+
+				if embeddeds:
+					if not isinstance( message, MIMEMultipart):
+						print "\n\n==================================================\n"
+						print "Found surprise multipart for embeddeds!\n"
+						print "\n==================================================\n"
+
+						message = MIMEMultipart()
+
+						set_headers( message, headers )
+					else:
+						print "\n\n==================================================\n"
+						print "Found embeddeds in multipart!\n"
+						print "\n==================================================\n"
 
 				if attachments:
 					if not isinstance( message, MIMEMultipart):
@@ -400,6 +418,7 @@ def convert( mbx, opts = None ):
 					in_headers = False
 
 					msg_lines = []
+					embeddeds = []
 					attachments = []
 			else:
 				# We're in the body of the text
@@ -418,11 +437,19 @@ def convert( mbx, opts = None ):
 					#EudoraLog.log.warn("Adding attachment with contenttype = " + contenttype)
 					attachments.append( (line, target) )
 				else:
-					if scrub_xflowed:
-						line = re.sub(re_xflowed, '', line)
-						line = re.sub(re_xhtml, '', line)
-						line = re.sub(re_pete_stuff, '', line)
-					msg_lines.append(strip_linesep(line) + "\n")
+					embedded_matcher = re_embedded.match ( line )
+					
+					if embedded_matcher:
+						filename = embedded_matcher.group(1)
+						embeddeds.append( filename )
+					else:
+						if scrub_xflowed:
+							line = re.sub(re_xflowed, '', line)
+							line = re.sub(re_xhtml, '', line)
+							line = re.sub(re_pete_stuff, '', line)
+
+						msg_lines.append(strip_linesep(line) + "\n")
+
 				last_file_position = INPUT.tell()
 
 	# Check if the file isn't empty and any messages have been processed.
