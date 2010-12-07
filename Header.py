@@ -209,7 +209,7 @@ class Header:
 		return self
 
 	def __str__( self ):
-		return "\n".join([name + value for (lcname, name, value) in self.data])
+		return "\n".join([name + " " + value for (lcname, name, value) in self.data])
 
 	def add( self, id, value ):
 		"""Will also accept un-parsed line"""
