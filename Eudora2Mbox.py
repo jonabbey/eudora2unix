@@ -453,7 +453,7 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 
 		try:
 			p.feed(msg_text)
-			cids = p.get_reset_cids()
+			cids = p.get_cids()
 		except HTMLParseError:
 			# okay, we've got unparseable HTML here.
 			# Let's just use a quick regexp to see if we can make sense of this.
@@ -461,11 +461,30 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 			cids = []
 
 			for match in re_cids_finder.finditer(msg_text):
-				print match.group(1)
 				cids.append(match.group(1))
 
 		for v in cids:
 			print v
+
+		if not len(cids) == len(embeddeds):
+			print "cids / embeddeds mismatch!"
+
+		print "\tcid\t\t\t\t\t\tembedded"
+
+		i = 0
+		while i < len(cids) or i < len(embeddeds):
+			if i < len(cids):
+				print "%d.\t%s" % (i, cids[i]),
+				print "\t" * (5 - (len(cids[i]) // 8)),
+			else:
+				print "%d.\t" % (i, ),
+				print "\t\t\t\t\t",
+			if i < len(embeddeds):
+				print embeddeds[i]
+			else:
+				print
+
+			i = i + 1
 
 		print "\n==================================================\n"
 
