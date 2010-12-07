@@ -476,17 +476,17 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 
 			print str(headers)
 
-		print "\tcid\t\t\t\t\t\tembedded"
+		print "\tcid\t\t\t\t\t\t\tembedded"
 
 		i = 0
 		while i < len(cids) or i < len(embeddeds):
 			if i < len(cids):
 				print "%d.\t%s" % (i, cids[i]),
-				print "\t" * (5 - (len(cids[i]) // 8)),
+				print "\t" * (6 - (len(cids[i]) // 8)),
 
 			else:
 				print "%d.\t" % (i, ),
-				print "\t\t\t\t\t",
+				print "\t\t\t\t\t\t",
 			if i < len(embeddeds):
 				print embeddeds[i],
 

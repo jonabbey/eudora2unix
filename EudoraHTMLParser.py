@@ -11,8 +11,12 @@ class EudoraHTMLParser(HTMLParser):
 	def handle_starttag(self, tag, attrs):
 		if tag == "img":
 			for k, v in attrs:
-				if k == 'src' and v.startswith('cid:'):
-					self.cids.append(v[4:])
+				if k == 'src':
+					if v.startswith('cid:'):
+						self.cids.append(v)
+					else:
+						if not v.startswith('http://') and not v.startswith('https://'):
+							self.cids.append(v)
 					
 	def handle_endtag(self, tag):
 		pass
