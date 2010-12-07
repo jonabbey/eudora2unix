@@ -311,8 +311,8 @@ class Header:
 		    return
 
             if( id and not id.lower() in Header.ok_to_dup and self.getValue( id ) ):
-                EudoraLog.log.warn( "extra '" + id +
-                                    "' header encountered - commented out ")
+                #EudoraLog.log.warn( "extra '" + id +
+                #                    "' header encountered - commented out ")
                 id = '>' + id
 
             self.add( id, value )
