@@ -148,6 +148,7 @@ paths_found = {}
 paths_missing = {}
 missing_attachments = {}
 found_attachments = {}
+attachments_dirs = []
 
 def convert( mbx, opts = None ):
 	"""
@@ -173,7 +174,7 @@ def convert( mbx, opts = None ):
 
 	"""
 
-	global attachments_listed, attachments_found, attachments_missing
+	global attachments_listed, attachments_found, attachments_missing, attachments_dirs
 
 	global paths_found, paths_missing, message_count
 	
@@ -229,6 +230,7 @@ def convert( mbx, opts = None ):
 	msg_lines = []
 	attachments = []
 	embeddeds = []
+	message = None
 	is_html = False
 	attachments_ok = False
 
@@ -254,90 +256,6 @@ def convert( mbx, opts = None ):
 		# avoid here with the test for 'Find '..
 
 		if line.find( 'Find ', 0, 5 ) and re_message_start.match( line ):
-			if msg_lines:
-				msg_text = ''.join(msg_lines)
-
-				# Need to add support here for processing embeddeds
-
-				if embeddeds:
-					if not isinstance( message, MIMEMultipart):
-						print "\n\n==================================================\n"
-						print "Found surprise multipart for embeddeds!\n"
-						print "\n==================================================\n"
-
-						message = MIMEMultipart()
-
-						set_headers( message, headers )
-					else:
-						print "\n\n==================================================\n"
-						print "Found embeddeds in multipart!\n"
-						print "\n==================================================\n"
-
-				if attachments:
-					if not isinstance( message, MIMEMultipart):
-						print "\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
-						print "Forcing surprise multipart!\n"
-						print "\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
-
-						message = MIMEMultipart()
-
-						set_headers( message, headers )
-
-					if is_html:
-						message.attach(MIMEText(msg_text, _subtype='html'))
-					else:
-						try:
-							message.attach(MIMEText(msg_text))
-						except Exception, e:
-							print "\nHEY HEY HEY message = " + str(msg_text) + "\n"
-							print "Type of message's payload is " + str(type(message.get_payload())) + "\n"
-							if isinstance( message.get_payload(), list ):
-								print "Size of message's payload list is " + str(len(message.get_payload())) + "\n"
-								print ")))))))))))))))))))) First part"
-								print str(message.get_payload()[0])
-								print ">>>>>>>>>>>>>>>>>>>> Second part"
-								print str(message.get_payload()[1])
-
-							print "attachments_contenttype is (%s)" % (attachments_contenttype, )
-							print "attachments_ok is (%s)" % (attachments_ok, )
-
-							if attachments:
-								print "Yeah, attachments were found: %d" % (len(attachments), )
-
-							print "EXCEPTION " + str(e) + "\n"
-							traceback.print_exc(file=sys.stdout)
-
-				else:
-					message.set_payload(msg_text)
-
-				if attachments:
-					for aline, atarget in attachments:
-						handle_attachment( aline, atarget, attachments_dirs, message )
-
-				try:
-					message_count = message_count + 1
-					newmailbox.add(message)
-				except Exception, e:
-					print "\nHEY message = " + str(msg_text) + "\n"
-					print "Type of message's payload is " + str(type(message.get_payload())) + "\n"
-					if isinstance( message.get_payload(), list ):
-						print "Size of message's payload list is " + str(len(message.get_payload())) + "\n"
-						print ")))))))))))))))))))) First part"
-						print str(message.get_payload()[0])
-						print ">>>>>>>>>>>>>>>>>>>> Second part"
-						print str(message.get_payload()[1])
-
-					print "attachments_contenttype is (%s)" % (attachments_contenttype, )
-					print "attachments_ok is (%s)" % (attachments_ok, )
-
-					if attachments:
-						print "Yeah, attachments were found: %d" % (len(attachments), )
-
-					print "EXCEPTION " + str(e) + "\n"
-					traceback.print_exc(file=sys.stdout)
-
-#				print ".", 
-
 			if in_headers:
 				# Error
 				#
@@ -349,8 +267,12 @@ def convert( mbx, opts = None ):
 				# Finally, emit this as a message
 				#
 				EudoraLog.log.error( 'Message start found inside message')
-				#emit_headers( headers, toc_info,
-				#	      msg_offset, EudoraLog.msg_no, replies, OUTPUT )
+
+			if headers:
+				message = craft_message(msg_lines, headers, attachments, embeddeds, is_html)
+
+				newmailbox.add(message)
+				message_count = message_count + 1
 
 			msg_offset = last_file_position
 			headers = Header()
@@ -368,54 +290,15 @@ def convert( mbx, opts = None ):
 					headers.add_line(line)
 				else:
 					# End of message headers.
-
-					# here is where we could
-					# create the message
-
-					contenttype = headers.getValue('Content-Type:')
-
-					if not contenttype:
-						msattach = headers.getValue('X-MS-Attachment:')
-
-						if msattach:
-							message = MIMEMultipart()
-							attachments_ok = "Dunno"
-							attachments_contenttype = "Still Dunno"
-						else:
-							message = MIMENonMultipart('text', 'plain')
-							attachments_ok = False
-							attachments_contenttype = False
-#							print "T",
-					elif not re_multi_contenttype.search( contenttype ):
-						if re_single_contenttype.search ( contenttype ):
-							mimetype = re_single_contenttype.sub( r'\1', contenttype )
-							(main, slash, sub) = mimetype.partition( '/' )
-							message = MIMENonMultipart(main, sub)
-							attachments_ok = False
-							attachments_contenttype = False
-#							print "X",
-						else:
-							print "*** %s" % (contenttype,)
-					else:
-						subtype = re_multi_contenttype.search( contenttype )
-						if subtype:
-							message = MIMEMultipart(_subtype=subtype.group(1))
-							attachments_ok = subtype.group(1)
-							attachments_contenttype = contenttype
-#							print "Y",
-						else:
-							message = MIMEMultipart()
-#							print "Z",
-							attachments_ok = "Dunno"
-							attachments_contenttype = "Still Dunno"
-
-					# set all the headers we've seen
+					
+					# scrub the header lines we've scanned
 
 					headers.clean(toc_info, msg_offset, replies)
 
-					set_headers( message, headers )
-
 					in_headers = False
+
+					# prep to start scanning lines
+					# in the body of the message
 
 					msg_lines = []
 					embeddeds = []
@@ -502,6 +385,113 @@ def convert( mbx, opts = None ):
 
 	return 0
 
+def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
+	"""This function handles the creation of a Python email.message
+	object from the msg_lines and headers lists created during the main
+	loop."""
+
+	contenttype = headers.getValue('Content-Type:')
+
+	if not contenttype:
+		msattach = headers.getValue('X-MS-Attachment:')
+
+		if msattach:
+			message = MIMEMultipart()
+			attachments_ok = "Dunno"
+			attachments_contenttype = "Still Dunno"
+		else:
+			message = MIMENonMultipart('text', 'plain')
+			attachments_ok = False
+			attachments_contenttype = False
+#			print "T",
+	elif not re_multi_contenttype.search( contenttype ):
+		if re_single_contenttype.search ( contenttype ):
+			mimetype = re_single_contenttype.sub( r'\1', contenttype )
+			(main, slash, sub) = mimetype.partition( '/' )
+			message = MIMENonMultipart(main, sub)
+			attachments_ok = False
+			attachments_contenttype = False
+#			print "X",
+		else:
+			print "*** %s" % (contenttype,)
+	else:
+		subtype = re_multi_contenttype.search( contenttype )
+		if subtype:
+			message = MIMEMultipart(_subtype=subtype.group(1))
+			attachments_ok = subtype.group(1)
+			attachments_contenttype = contenttype
+#			print "Y",
+		else:
+			message = MIMEMultipart()
+#			print "Z",
+			attachments_ok = "Dunno"
+			attachments_contenttype = "Still Dunno"
+
+	# Need to add support here for processing embeddeds
+
+	if embeddeds:
+		if not isinstance( message, MIMEMultipart):
+			print "\n\n==================================================\n"
+			print "Found surprise multipart for embeddeds!\n"
+			print "\n==================================================\n"
+
+			message = MIMEMultipart()
+		else:
+			print "\n\n==================================================\n"
+			print "Found embeddeds in multipart!\n"
+			print "\n==================================================\n"
+
+	if attachments:
+		if not isinstance( message, MIMEMultipart):
+			print "\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
+			print "Forcing surprise multipart!\n"
+			print "\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
+
+			message = MIMEMultipart()
+
+	# bind the headers into our message
+
+	set_headers( message, headers )
+
+	if msg_lines:
+		msg_text = ''.join(msg_lines)
+	else:
+		msg_text = ''
+
+	try:
+		if not isinstance( message, MIMEMultipart):
+			message.set_payload(msg_text)
+		else:
+			if is_html:
+				message.attach(MIMEText(msg_text, _subtype='html'))
+			else:
+				message.attach(MIMEText(msg_text))
+	except Exception, e:
+		print "\nHEY HEY HEY message = " + str(msg_text) + "\n"
+		print "Type of message's payload is " + str(type(message.get_payload())) + "\n"
+		if isinstance( message.get_payload(), list ):
+			print "Size of message's payload list is " + str(len(message.get_payload())) + "\n"
+			print ")))))))))))))))))))) First part"
+			print str(message.get_payload()[0])
+			print ">>>>>>>>>>>>>>>>>>>> Second part"
+			print str(message.get_payload()[1])
+
+		print "attachments_contenttype is (%s)" % (attachments_contenttype, )
+		print "attachments_ok is (%s)" % (attachments_ok, )
+
+		if attachments:
+			print "Yeah, attachments were found: %d" % (len(attachments), )
+
+		print "EXCEPTION " + str(e) + "\n"
+		traceback.print_exc(file=sys.stdout)
+
+	if attachments:
+		for aline, atarget in attachments:
+			handle_attachment( aline, atarget, message )
+
+	return message
+
+
 def set_headers( message, headers):
 	for header, value in headers:
 		if header != 'From ' and not re_contenttype.match( header ):
@@ -512,7 +502,7 @@ def set_headers( message, headers):
 					
 	message.set_unixfrom('From ' + myfrom)
 
-def handle_attachment( line, target, attachments_dirs, message ):
+def handle_attachment( line, target, message ):
 	"""
 	Mac versions put "Attachment converted", Windows (Lite) has
 	"Attachment Converted". 
@@ -533,7 +523,7 @@ def handle_attachment( line, target, attachments_dirs, message ):
 	leaving the old filepath.
 	"""
 
-	global attachments_listed, attachments_found, attachments_missing
+	global attachments_listed, attachments_found, attachments_missing, attachments_dirs
 	global paths_found, paths_missing
 	global missing_attachments, found_attachments
 
