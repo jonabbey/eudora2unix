@@ -279,7 +279,7 @@ def convert( mbx, embedded_dir = None, opts = None ):
 				EudoraLog.log.error( 'Message start found inside message')
 
 			if headers:
-				message = craft_message(msg_lines, headers, attachments, embeddeds, is_html)
+				message = craft_message(msg_lines, headers, attachments, embeddeds, mbx, is_html)
 
 				newmailbox.add(message)
 				message_count = message_count + 1
@@ -395,7 +395,7 @@ def convert( mbx, embedded_dir = None, opts = None ):
 
 	return 0
 
-def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
+def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
 	"""This function handles the creation of a Python email.message
 	object from the msg_lines and headers lists created during the main
 	loop."""
@@ -469,12 +469,17 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 			cids = []
 
 			for match in re_cids_finder.finditer(msg_text):
-				cids.append(match.group(1))
+				cids.append("cid:" + match.group(1))
 
 		if not len(cids) == len(embeddeds):
 			print "cids / embeddeds mismatch!"
 
-			print str(headers)
+			print mbx
+			print "To: " + headers.getValue('To:')
+			print "From: " + headers.getValue('From:')
+			print "Subject: " + headers.getValue('Subject:')
+			print "Date: " + headers.getValue('Date:')
+			print
 
 		print "\tcid\t\t\t\t\t\t\tembedded"
 
@@ -503,9 +508,9 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 
 	if attachments:
 		if not isinstance( message, MIMEMultipart):
-			print "\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
-			print "Forcing surprise multipart!\n"
-			print "\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
+			#print "\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
+			#print "Forcing surprise multipart!\n"
+			#print "\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
 
 			message = MIMEMultipart()
 
