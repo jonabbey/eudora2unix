@@ -154,7 +154,9 @@ missing_attachments = {}
 found_attachments = {}
 attachments_dirs = []
 
-def convert( mbx, opts = None ):
+edir = None
+
+def convert( mbx, embedded_dir = None, opts = None ):
 	"""
 	Start at the Eudora specific pattern "^From ???@???" and keep gathering
 	all headers.  When an empty line is found, emit the headers.
@@ -181,10 +183,14 @@ def convert( mbx, opts = None ):
 	global attachments_listed, attachments_found, attachments_missing, attachments_dirs
 
 	global paths_found, paths_missing, message_count
-	
+
+	global edir
+
 	attachments_listed = 0
 	attachments_found = 0
 	attachments_missing = 0
+
+	edir = embedded_dir
 
 	print "Converting %s" % (mbx,)
 
@@ -394,6 +400,8 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 	object from the msg_lines and headers lists created during the main
 	loop."""
 
+	global edir
+
 	if msg_lines:
 		msg_text = ''.join(msg_lines)
 	else:
@@ -482,7 +490,7 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 			if i < len(embeddeds):
 				print embeddeds[i],
 
-				if os.path.exists('Embedded' + os.pathsep + embeddeds[i]):
+				if os.path.exists(edir + os.sep + embeddeds[i]):
 					print " *"
 				else:
 					print " !"

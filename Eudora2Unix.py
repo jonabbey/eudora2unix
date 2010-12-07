@@ -39,6 +39,8 @@ isMac = False;	# global for convert_files
 attachments_not_handled = set()
 attachments_handled_by = {}
 
+embedded_dir = None
+
 # --------------------- Comments & complaints ----------------------
 def usage_complaint( arg ):
 	return [
@@ -285,6 +287,10 @@ def convert_directory( eudoradir, opts ):
 	maildirLENGTH = len( maildir )
 
 	eudoradir = abspath( eudoradir )
+
+	if os.path.exists(eudoradir + os.sep + "Embedded"):
+		global embedded_dir
+		embedded_dir = eudoradir + os.sep + "Embedded"
 
 	if isdir( maildir ):
 		complain( target_directory_already_exists_complaint( maildir ) )
@@ -577,7 +583,8 @@ def convert_files( avoid_dirlist, dir, names ):
 				except OSError, ( errno, str ):
 					complain( toc_complaint( f_toc, str ) )
 			moveFile( fpath, f_nombx )
-			Eudora2Mbox.convert( f_nombx, opts )
+			global embedded_dir
+			Eudora2Mbox.convert( f_nombx, embedded_dir, opts )
 			file1 = f_nombx + ".new"
 			file2 = f_nombx
 
