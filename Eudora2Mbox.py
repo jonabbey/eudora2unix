@@ -480,7 +480,7 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 			if i < len(embeddeds):
 				print embeddeds[i],
 
-				if os.path.exists('/VOLUMES/huckabay/store/Eudora/Embedded/' + embeddeds[i]):
+				if os.path.exists('Embedded' + os.pathsep + embeddeds[i]):
 					print " *"
 				else:
 					print " !"
