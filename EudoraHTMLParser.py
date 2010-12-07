@@ -3,7 +3,7 @@ from HTMLParser import HTMLParser
 
 class EudoraHTMLParser(HTMLParser):
 
-	self.cids = []
+	cids = []
 
 	def handle_starttag(self, tag, attrs):
 		if tag == "img":
