@@ -522,6 +522,7 @@ class Header:
                                                     hpri = 'F'
                                             self.setValue( 'X-Status:', hpri )
                     else:
-                            EudoraLog.log.warn( "No toc entry for message at offset " + offset_str)
+			    pass
+                            # EudoraLog.log.warn( "No toc entry for message at offset " + offset_str)
 
             self.cleaned = True
