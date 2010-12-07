@@ -473,12 +473,12 @@ def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
 
 		if not len(cids) == len(embeddeds):
 			print "cids / embeddeds mismatch!"
-
+			print
 			print mbx
-			print "To: " + headers.getValue('To:')
-			print "From: " + headers.getValue('From:')
-			print "Subject: " + headers.getValue('Subject:')
-			print "Date: " + headers.getValue('Date:')
+
+			for piece in ['To:', 'From:' , 'Subject:', 'Date:']:
+				if headers.getValue(piece):
+					print piece + " " + headers.getValue(piece)[:80]
 			print
 
 		print "\tcid\t\t\t\t\t\t\tembedded"
