@@ -56,6 +56,7 @@ import string
 import getopt
 import urllib
 import traceback
+from HTMLParser import HTMLParseError
 from email import message, encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.nonmultipart import MIMENonMultipart
@@ -68,6 +69,7 @@ import mimetypes
 
 from Header import Replies, TOC_Info, Header, strip_linesep, re_message_start
 import EudoraLog
+from EudoraHTMLParser import *
 
 #
 # Copyright and Author:
@@ -134,6 +136,8 @@ re_xflowed = re.compile( r'</?x-flowed>')
 re_xhtml = re.compile( r'</?x-html>' )
 re_pete_stuff = re.compile( r'<!x-stuff-for-pete[^>]+>' )
 re_filename_cleaner = re.compile( r'^(.*\.\S+).*$' )
+re_cids_finder = re.compile(r'<img src="cid:([^"]+)"', re.IGNORECASE)
+
 # Don't like this.  Too greedy for parentheses.
 re_mac_info = re.compile( r'(.*?)\s(\(.*?\)).*$' )
 re_dos_path_beginning = re.compile( r'.*:\\.*' )
@@ -390,6 +394,11 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 	object from the msg_lines and headers lists created during the main
 	loop."""
 
+	if msg_lines:
+		msg_text = ''.join(msg_lines)
+	else:
+		msg_text = ''
+
 	contenttype = headers.getValue('Content-Type:')
 
 	if not contenttype:
@@ -433,13 +442,32 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 		if not isinstance( message, MIMEMultipart):
 			print "\n\n==================================================\n"
 			print "Found surprise multipart for embeddeds!\n"
-			print "\n==================================================\n"
 
 			message = MIMEMultipart()
 		else:
 			print "\n\n==================================================\n"
 			print "Found embeddeds in multipart!\n"
-			print "\n==================================================\n"
+
+
+		p = EudoraHTMLParser()
+
+		try:
+			p.feed(msg_text)
+			cids = p.get_reset_cids()
+		except HTMLParseError:
+			# okay, we've got unparseable HTML here.
+			# Let's just use a quick regexp to see if we can make sense of this.
+
+			cids = []
+
+			for match in re_cids_finder.finditer(msg_text):
+				print match.group(1)
+				cids.append(match.group(1))
+
+		for v in cids:
+			print v
+
+		print "\n==================================================\n"
 
 	if attachments:
 		if not isinstance( message, MIMEMultipart):
@@ -453,10 +481,6 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 
 	set_headers( message, headers )
 
-	if msg_lines:
-		msg_text = ''.join(msg_lines)
-	else:
-		msg_text = ''
 
 	try:
 		if not isinstance( message, MIMEMultipart):

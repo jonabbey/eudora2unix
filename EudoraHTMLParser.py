@@ -1,5 +1,6 @@
 import os
-from HTMLParser import HTMLParser
+import re
+from HTMLParser import HTMLParser, HTMLParseError
 
 class EudoraHTMLParser(HTMLParser):
 
@@ -9,6 +10,7 @@ class EudoraHTMLParser(HTMLParser):
 		if tag == "img":
 			for k, v in attrs:
 				if k == 'src' and v.startswith('cid:'):
+					print v[4:]
 					self.cids.append(v[4:])
 					
 	def handle_endtag(self, tag):
@@ -18,4 +20,5 @@ class EudoraHTMLParser(HTMLParser):
 		retr = self.cids
 		self.cids = []
 		return self.cids
+
 
