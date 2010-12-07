@@ -463,9 +463,6 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 			for match in re_cids_finder.finditer(msg_text):
 				cids.append(match.group(1))
 
-		for v in cids:
-			print v
-
 		if not len(cids) == len(embeddeds):
 			print "cids / embeddeds mismatch!"
 
@@ -476,11 +473,17 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 			if i < len(cids):
 				print "%d.\t%s" % (i, cids[i]),
 				print "\t" * (5 - (len(cids[i]) // 8)),
+
 			else:
 				print "%d.\t" % (i, ),
 				print "\t\t\t\t\t",
 			if i < len(embeddeds):
-				print embeddeds[i]
+				print embeddeds[i],
+
+				if os.path.exists('/VOLUMES/huckabay/store/Eudora/Embedded/' + embeddeds[i]):
+					print " *"
+				else:
+					print " !"
 			else:
 				print
 
