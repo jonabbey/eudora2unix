@@ -466,6 +466,8 @@ def craft_message( msg_lines, headers, attachments, embeddeds, is_html ):
 		if not len(cids) == len(embeddeds):
 			print "cids / embeddeds mismatch!"
 
+			print str(headers)
+
 		print "\tcid\t\t\t\t\t\tembedded"
 
 		i = 0
