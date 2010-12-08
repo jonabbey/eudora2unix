@@ -281,7 +281,12 @@ def convert( mbx, embedded_dir = None, opts = None ):
 			if headers:
 				message = craft_message(msg_lines, headers, attachments, embeddeds, mbx, is_html)
 
-				newmailbox.add(message)
+				try:
+					newmailbox.add(message)
+				except TypeError:
+					print str(headers)
+					traceback.print_exc(file=sys.stdout)
+
 				message_count = message_count + 1
 
 			msg_offset = last_file_position
