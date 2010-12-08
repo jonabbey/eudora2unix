@@ -63,6 +63,7 @@ from email.mime.nonmultipart import MIMENonMultipart
 from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
+from email.mime.message import MIMEMessage
 from email.mime.audio import MIMEAudio
 from mailbox import mbox
 import mimetypes
@@ -431,8 +432,16 @@ def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
 	elif not re_multi_contenttype.search( contenttype ):
 		if re_single_contenttype.search ( contenttype ):
 			mimetype = re_single_contenttype.sub( r'\1', contenttype )
+			print "HEYNYEHYHEYSDF mimetype = %s" % (mimetype,)
 			(main, slash, sub) = mimetype.partition( '/' )
-			message = MIMENonMultipart(main, sub)
+			print "HEYNYEHYHEYSDF main, sub = %s,%s" % (main,sub)
+			if main == 'message':
+				print msg_text
+				headers, content = msg_text.split("\r\n\r\n", 1)
+				print "HEY headers = %s\n\nHEY body = %s" % (headers, content)
+				message = MIMEMessage(main, sub)
+			else:
+				message = MIMENonMultipart(main, sub)
 			attachments_ok = False
 			attachments_contenttype = False
 #			print "X",
