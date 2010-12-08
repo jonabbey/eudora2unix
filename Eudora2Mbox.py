@@ -402,6 +402,8 @@ def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
 
 	global edir
 
+	embeddedcids = []
+
 	if msg_lines:
 		msg_text = ''.join(msg_lines)
 	else:
@@ -451,7 +453,7 @@ def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
 			print "\n\n==================================================\n"
 			print "Found surprise multipart for embeddeds!\n"
 
-			message = MIMEMultipart()
+			message = MIMEMultipart(_subtype='related')
 		else:
 			print "\n\n==================================================\n"
 			print "Found embeddeds in multipart!\n"
@@ -502,7 +504,18 @@ def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
 			else:
 				print
 
+			if i < len(cids) and i < len(embeddeds):
+				if cids[i].startswith('cid:'):
+					embeddedcids.append( (cids[i][4:], embeddeds[i]) )
+				else:
+					embeddedcids.append( (cids[i], embeddeds[i]) )
+
 			i = i + 1
+
+		print "\n\nAttaching inline components:"
+
+		for c, f in embeddedcids:
+			print "%s\t%s" % (c, f)
 
 		print "\n==================================================\n"
 
@@ -549,6 +562,10 @@ def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
 	if attachments:
 		for aline, atarget in attachments:
 			handle_attachment( aline, atarget, message )
+
+	if embeddedcids:
+		for cid, filename in embeddedcids:
+			handle_embedded(cid, filename, message)
 
 	return message
 
@@ -744,6 +761,49 @@ def handle_attachment( line, target, message ):
 			paths_missing[orig_path] = paths_missing[orig_path] + 1
 		else:
 			paths_missing[orig_path] = 1
+
+def handle_embedded( cid, filename, message ):
+	global edir
+	global attachments_listed, attachments_found, attachments_missing, attachments_dirs
+	global paths_found, paths_missing
+	global missing_attachments, found_attachments
+
+	realfilename = edir + os.sep + filename
+
+	if not os.path.exists(realfilename):
+		print "Couldn't find embedded file %s" % (realfilename,)
+		return
+
+	mimeinfo = mimetypes.guess_type(realfilename)
+
+	if not mimeinfo[0]:
+		(mimetype, mimesubtype) = ('application', 'octet-stream')
+	else:
+		(mimetype, mimesubtype) = mimeinfo[0].split('/')
+
+	if os.path.isfile(realfilename):
+		fp = open(realfilename, 'rb')
+
+		try:
+			if mimetype == 'application' or mimetype == 'video':
+				msg = MIMEApplication(fp.read(), _subtype=mimesubtype)
+			elif mimetype == 'image':
+				msg = MIMEImage(fp.read(), _subtype=mimesubtype)
+			elif mimetype == 'text':
+				msg = MIMEText(fp.read(), _subtype=mimesubtype)
+			elif mimetype == 'audio':
+				msg = MIMEAudio(fp.read(), _subtype=mimesubtype)
+			else:
+				EudoraLog.log.error("Unrecognized mime type '%s' while processing attachment '%s'" % (mimeinfo[0], filename))
+				return
+		finally:
+			fp.close()
+
+		msg.add_header('Content-ID', cid)
+		msg.add_header('Content-Disposition', 'inline', filename=filename)
+
+		message.attach(msg)
+
 
 #import profile
 # File argument (must be exactly 1).
