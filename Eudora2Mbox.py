@@ -562,7 +562,7 @@ def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
 
 
 	try:
-		if not isinstance( message, MIMEMultipart):
+		if  not isinstance( message, MIMEMultipart):
 			message.set_payload(msg_text)
 		else:
 			if is_html:
