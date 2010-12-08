@@ -485,6 +485,8 @@ def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
 
 		print "\tcid\t\t\t\t\t\t\tembedded"
 
+
+
 		i = 0
 		while i < len(cids) or i < len(embeddeds):
 			if i < len(cids):
@@ -504,13 +506,40 @@ def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
 			else:
 				print
 
-			if i < len(cids) and i < len(embeddeds):
-				if cids[i].startswith('cid:'):
-					embeddedcids.append( (cids[i][4:], embeddeds[i]) )
-				else:
-					embeddedcids.append( (cids[i], embeddeds[i]) )
-
 			i = i + 1
+
+		cidi = 0
+		embeddedi = 0
+		cidsmatched = set()
+		while cidi < len(cids) or embeddedi < len(embeddeds):
+			if cidi < len(cids) and embeddedi < len(embeddeds):
+				if cids[cidi].startswith('cid:'):
+					actualcid = cids[cidi][4:]
+				else:
+					actualcid = cids[cidi]
+
+				# the document might have several img
+				# references to the same cid.. we
+				# don't want to try to mate up
+				# multiple inline files in that case
+
+				if actualcid in cidsmatched:
+					cidi = cidi + 1
+				else:
+					cidsmatched.add(actualcid)
+					embeddedcids.append( (actualcid, embeddeds[embeddedi]) )
+					embeddedi = embeddedi + 1
+					cidi = cidi + 1
+			else:
+				if embeddedi < len(embeddeds):
+					embeddedcids.append( (None, embeddeds[embeddedi]) )
+					embeddedi = embeddedi + 1
+				else:
+					# we have more cids than
+					# embeddeds, keep looping
+					# through
+					cidi = cidi + 1
+
 
 		print "\n\nAttaching inline components:"
 
@@ -799,8 +828,11 @@ def handle_embedded( cid, filename, message ):
 		finally:
 			fp.close()
 
-		msg.add_header('Content-ID', cid)
-		msg.add_header('Content-Disposition', 'inline', filename=filename)
+		if cid:
+			msg.add_header('Content-ID', cid)
+			msg.add_header('Content-Disposition', 'inline', filename=filename)
+		else:
+			msg.add_header('Content-Disposition', 'attachment', filename=filename)
 
 		message.attach(msg)
 
