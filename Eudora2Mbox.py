@@ -261,8 +261,6 @@ def convert( mbx, embedded_dir = None, opts = None ):
 
 		if msg_lines and (not line or re_message_start.match( line )):
 
-			print "\n\nIOIOIOIOIOIO\n\n%s\n\nOIOIOIOIOIOI\n" % (''.join(msg_lines),)
-
 			(headers, body, attachments, embeddeds, mbx) = extract_pieces(msg_lines, last_file_position, mbx)
 
 			message = craft_message(headers, body, attachments, embeddeds, mbx)
@@ -377,8 +375,6 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 
 				if not inner_mesg:
 					headers.clean(toc_info, msg_offset, replies)
-				else:
-					print "\nYO SKIPPED CLEANING INNER HEADERS:\n\n%s\n" % (headers,)
 
 				in_headers = False
 
@@ -458,18 +454,11 @@ def craft_message( headers, body, attachments, embeddeds, mbx):
 			print "T",
 	elif re_rfc822.search( contenttype ):
 		print "[",
-		(myheaders, mybody, myattachments, myembeddeds, mymbx) = extract_pieces(body, -1, mbx, True)
-		print "\n\nbODY1: %s\n--------------------------------------------------\n\nhEADERS2: %s\n\nbODY2: %s\n\nmyattachments: %s, \nmyembeddeds: %s\n" % (''.join(body), myheaders, ''.join(mybody), myattachments, myembeddeds)
-		
-		innermessage = craft_message(myheaders, mybody, myattachments, myembeddeds, mymbx)
-
-		print "QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ\n\n%s\n\nRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR\n\n" % (innermessage)
-		message = MIMEMessage(innermessage)
+		message = MIMEMessage(craft_message(*extract_pieces(body, -1, mbx, True)))
 		print "]",
 	elif not re_multi_contenttype.search( contenttype ):
 		if re_single_contenttype.search ( contenttype ):
 			mimetype = re_single_contenttype.sub( r'\1', contenttype )
-			print "HEYNYEHYHEYSDF mimetype = %s" % (mimetype,)
 			(main, slash, sub) = mimetype.partition( '/' )
 			message = MIMENonMultipart(main, sub)
 			attachments_ok = False
@@ -483,7 +472,7 @@ def craft_message( headers, body, attachments, embeddeds, mbx):
 			message = MIMEMultipart(_subtype=subtype.group(1))
 			attachments_ok = subtype.group(1)
 			attachments_contenttype = contenttype
-			print "Y == %s" % (contenttype, ),
+			print "Y",
 		else:
 			message = MIMEMultipart()
 			print "Z",
@@ -830,7 +819,7 @@ def handle_attachment( line, target, message ):
 			missing_attachments[EudoraLog.log.mbx_name()] = []
 		missing_attachments[EudoraLog.log.mbx_name()].append(attachment_desc)
 
-		EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
+		# EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
 
 		if orig_path in paths_missing:
 			paths_missing[orig_path] = paths_missing[orig_path] + 1
