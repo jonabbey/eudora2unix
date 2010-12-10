@@ -357,7 +357,7 @@ class Header:
 		    print "Hey, already cleaned!"
 		    return
 
-	    gloabl re_between_angles, re_before_parenth, re_after_parenth
+	    global re_between_angles, re_before_parenth, re_after_parenth
 
             hdr_line0 = self.getValue( 'From ' )	# still has line end
 
