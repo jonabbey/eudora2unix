@@ -261,7 +261,11 @@ def convert( mbx, embedded_dir = None, opts = None ):
 
 		if msg_lines and (not line or re_message_start.match( line )):
 
-			message = craft_message(*extract_pieces(msg_lines, last_file_position, mbx))
+			print "\n\nIOIOIOIOIOIO\n\n%s\n\nOIOIOIOIOIOI\n" % (''.join(msg_lines),)
+
+			(headers, body, attachments, embeddeds, mbx) = extract_pieces(msg_lines, last_file_position, mbx)
+
+			message = craft_message(headers, body, attachments, embeddeds, mbx)
 
 			try:
 				newmailbox.add(message)
@@ -354,7 +358,8 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 	in_headers = True
 	found_rfc822_inner_mesg = False
 
-	headers.add( 'From ', msg_lines[0][5:].strip() )
+	if not inner_mesg:
+		headers.add( 'From ', msg_lines[0][5:].strip() )
 
 	for line in msg_lines:
 		if in_headers:
@@ -367,18 +372,21 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 			else:
 				# End of message headers.
 
-
 				# scrub the header lines we've scanned
 
 				if not inner_mesg:
 					headers.clean(toc_info, msg_offset, replies)
+				else:
+					print "\nYO SKIPPED CLEANING INNER HEADERS:\n\n%s\n" % (headers,)
 
 				in_headers = False
 
 				content_type = headers.getValue('Content-Type:')
 
-				if content_type.lower() == 'message/rfc822':
+				if content_type and content_type.lower() == 'message/rfc822':
 					found_rfc822_inner_mesg = True
+
+					print "+",
 		elif found_rfc822_inner_mesg:
 			# We're processing a message/rfc822 message,
 			# and so we don't want to process attachments
@@ -446,15 +454,19 @@ def craft_message( headers, body, attachments, embeddeds, mbx):
 			message = MIMENonMultipart('text', 'plain')
 			attachments_ok = False
 			attachments_contenttype = False
-#			print "T",
+			print "T",
 	elif re_rfc822.search( contenttype ):
-		message = MIMEMessage(craft_message(*extract_pieces(body, -1, mbx, True)))
+		print "[",
+		(myheaders, mybody, myattachments, myembeddeds, mymbx) = extract_pieces(body, -1, mbx, True)
+		print "\n\nbODY1: %s\n--------------------------------------------------\n\nhEADERS2: %s\n\nbODY2: %s\n\nmyattachments: %s, \nmyembeddeds: %s\n" % (''.join(body), myheaders, ''.join(mybody), myattachments, myembeddeds)
+		
+		message = MIMEMessage(craft_message(myheaders, mybody, myattachments, myembeddeds, mymbx))
+		print "]",
 	elif not re_multi_contenttype.search( contenttype ):
 		if re_single_contenttype.search ( contenttype ):
 			mimetype = re_single_contenttype.sub( r'\1', contenttype )
 			print "HEYNYEHYHEYSDF mimetype = %s" % (mimetype,)
 			(main, slash, sub) = mimetype.partition( '/' )
-			print "HEYNYEHYHEYSDF main, sub = %s,%s" % (main,sub)
 			if main == 'message':
 				print msg_text
 				headers, content = msg_text.split("\r\n\r\n", 1)
@@ -464,7 +476,7 @@ def craft_message( headers, body, attachments, embeddeds, mbx):
 				message = MIMENonMultipart(main, sub)
 			attachments_ok = False
 			attachments_contenttype = False
-#			print "X",
+			print "X",
 		else:
 			print "*** %s" % (contenttype,)
 	else:
@@ -473,10 +485,10 @@ def craft_message( headers, body, attachments, embeddeds, mbx):
 			message = MIMEMultipart(_subtype=subtype.group(1))
 			attachments_ok = subtype.group(1)
 			attachments_contenttype = contenttype
-#			print "Y",
+			print "Y == %s" % (contenttype, ),
 		else:
 			message = MIMEMultipart()
-#			print "Z",
+			print "Z",
 			attachments_ok = "Dunno"
 			attachments_contenttype = "Still Dunno"
 
@@ -637,8 +649,9 @@ def set_headers( message, headers):
 			message[newheader] = value
 
 	myfrom = headers.getValue('From ')
-					
-	message.set_unixfrom('From ' + myfrom)
+
+	if myfrom:
+		message.set_unixfrom('From ' + myfrom)
 
 def handle_attachment( line, target, message ):
 	"""
