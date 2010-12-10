@@ -158,6 +158,9 @@ missing_attachments = {}
 found_attachments = {}
 attachments_dirs = []
 
+target = None
+toc_info = None
+replies = None
 edir = None
 
 def convert( mbx, embedded_dir = None, opts = None ):
@@ -190,6 +193,7 @@ def convert( mbx, embedded_dir = None, opts = None ):
 
 	global re_initial_whitespace
 
+	global toc_info, replies, target
 	global edir
 
 	attachments_listed = 0
@@ -257,7 +261,7 @@ def convert( mbx, embedded_dir = None, opts = None ):
 
 		if msg_lines and (not line or re_message_start.match( line )):
 
-			message = craft_message(extract_pieces(msg_lines, last_file_position, mbx))
+			message = craft_message(*extract_pieces(msg_lines, last_file_position, mbx))
 
 			try:
 				newmailbox.add(message)
@@ -339,6 +343,9 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 	of embedded definition tuples, and the name of the MBX file
 	we're processing."""
 
+	global toc_info, replies
+	global target
+
 	headers = Header()
 	body = []
 	attachments = []
@@ -346,6 +353,8 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 
 	in_headers = True
 	found_rfc822_inner_mesg = False
+
+	headers.add( 'From ', msg_lines[0][5:].strip() )
 
 	for line in msg_lines:
 		if in_headers:
@@ -357,6 +366,7 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 				headers.add_line(line)
 			else:
 				# End of message headers.
+
 
 				# scrub the header lines we've scanned
 
@@ -404,7 +414,7 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 
 					body.append(strip_linesep(line) + "\n")
 
-	return ( header, body, attachments, embeddeds )
+	return ( headers, body, attachments, embeddeds, mbx )
 
 def craft_message( headers, body, attachments, embeddeds, mbx):
 	"""This function handles the creation of a Python
@@ -438,7 +448,7 @@ def craft_message( headers, body, attachments, embeddeds, mbx):
 			attachments_contenttype = False
 #			print "T",
 	elif re_rfc822.search( contenttype ):
-		message = MIMEMessage(craft_message(extract_pieces(body, last_file_position, mbx, True)))
+		message = MIMEMessage(craft_message(*extract_pieces(body, -1, mbx, True)))
 	elif not re_multi_contenttype.search( contenttype ):
 		if re_single_contenttype.search ( contenttype ):
 			mimetype = re_single_contenttype.sub( r'\1', contenttype )
