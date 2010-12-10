@@ -143,6 +143,8 @@ re_cids_finder = re.compile(r'<img src="cid:([^"]+)"', re.IGNORECASE)
 re_mac_info = re.compile( r'(.*?)\s(\(.*?\)).*$' )
 re_dos_path_beginning = re.compile( r'.*:\\.*' )
 
+re_initial_whitespace = re.compile( r'^[ \t]+(.*?)$' )
+
 mimetypes.init()
 
 scrub_xflowed = True
@@ -185,6 +187,8 @@ def convert( mbx, embedded_dir = None, opts = None ):
 
 	global paths_found, paths_missing, message_count
 
+	global re_initial_whitespace
+
 	global edir
 
 	attachments_listed = 0
@@ -216,9 +220,6 @@ def convert( mbx, embedded_dir = None, opts = None ):
 	in_headers = False
 	last_file_position = 0
 	msg_offset = 0
-
-	re_initial_whitespace = re.compile( r'^[ \t]+(.*?)$' )
-
 	EudoraLog.log = EudoraLog.Log( mbx )
 
 	try:
