@@ -128,6 +128,7 @@ message_count = 0
 re_quoted_attachment = re.compile( r'^Attachment converted: "([^"]*)"\s*$', re.IGNORECASE )
 re_attachment = re.compile( r'^Attachment converted: (.*)$', re.IGNORECASE )
 re_embedded = re.compile( r'^Embedded Content: ([^:]+):.*' )
+re_rfc822 = re.compile( r'message/rfc822', re.IGNORECASE )
 re_multi_contenttype = re.compile( r'multipart/([^;]+);.*', re.IGNORECASE )
 re_single_contenttype = re.compile( r'^([^;]+);?.*', re.IGNORECASE )
 re_charset_contenttype = re.compile( r'charset="([^"]+)"', re.IGNORECASE )
@@ -213,13 +214,6 @@ def convert( mbx, embedded_dir = None, opts = None ):
 			elif f == '-t':
 				target = v
 
-	EudoraLog.msg_no	= 0	# number of messages in this mailbox
-	EudoraLog.line_no	= 0	# line number of current line record (for messages)
-
-	headers = None
-	in_headers = False
-	last_file_position = 0
-	msg_offset = 0
 	EudoraLog.log = EudoraLog.Log( mbx )
 
 	try:
@@ -239,12 +233,16 @@ def convert( mbx, embedded_dir = None, opts = None ):
 	toc_info = TOC_Info( mbx )
 	replies = Replies( INPUT )
 
+	headers = None
+	last_file_position = 0
+	msg_offset = 0
 	msg_lines = []
 	attachments = []
 	embeddeds = []
 	message = None
-	is_html = False
-	attachments_ok = False
+
+	EudoraLog.msg_no	= 0	# number of messages in this mailbox
+	EudoraLog.line_no	= 0	# line number of current line record (for messages)
 
 	# Main loop, that reads the mailbox file and converts.
 	#
@@ -256,113 +254,34 @@ def convert( mbx, embedded_dir = None, opts = None ):
 	# <http://www.python.org/peps/pep-0234.html>
 	while True:
 		line = INPUT.readline()
+
+		if msg_lines and (not line or re_message_start.match( line )):
+
+			message = craft_message(extract_pieces(msg_lines, last_file_position, mbx))
+
+			try:
+				newmailbox.add(message)
+			except TypeError:
+				print str(headers)
+				traceback.print_exc(file=sys.stdout)
+
+			EudoraLog.msg_no = EudoraLog.msg_no + 1
+			msg_offset = last_file_position
+
+			msg_lines = []
+
 		if not line:
 			break
+
+		msg_lines.append(strip_linesep(line) + "\n")
+		last_file_position = INPUT.tell()
 		EudoraLog.line_no += 1
-
-		# find returns -1 (i.e., true) if it couldn't find
-		# 'Find ', so in fact this next if is looking to see
-		# if the line does *not* begin with 'Find '.
-		#
-		# I'm not sure what the original author was trying to
-		# avoid here with the test for 'Find '..
-
-		if line.find( 'Find ', 0, 5 ) and re_message_start.match( line ):
-			if in_headers:
-				# Error
-				#
-				# We have a "From " line while already 
-				# _in_ the headers. The previous message is 
-				# probably empty and does not have the required
-				# empty line to terminate the message
-				# headers and start the message body.
-				# Finally, emit this as a message
-				#
-				EudoraLog.log.error( 'Message start found inside message')
-
-			if headers:
-				message = craft_message(msg_lines, headers, attachments, embeddeds, mbx, is_html)
-
-				try:
-					newmailbox.add(message)
-				except TypeError:
-					print str(headers)
-					traceback.print_exc(file=sys.stdout)
-
-				message_count = message_count + 1
-
-			msg_offset = last_file_position
-			headers = Header()
-			headers.add( 'From ', line[5:].strip() )
-			in_headers = True
-			is_html = False
-			EudoraLog.msg_no += 1
-		else:
-			if in_headers:
-				if re_initial_whitespace.match( line ):
-					# Header "folding" (RFC 2822 3.2.3)
-					headers.appendToLast( line )
-				elif len( line.strip() ) != 0:
-					# Message header
-					headers.add_line(line)
-				else:
-					# End of message headers.
-					
-					# scrub the header lines we've scanned
-
-					headers.clean(toc_info, msg_offset, replies)
-
-					in_headers = False
-
-					# prep to start scanning lines
-					# in the body of the message
-
-					msg_lines = []
-					embeddeds = []
-					attachments = []
-			else:
-				# We're in the body of the text
-
-				if re_xhtml.search ( line ):
-					is_html = True
-				
-				if attachments_dirs and re_attachment.search( line ):
-					# remove the newline that
-					# Eudora inserts before the
-					# 'Attachment Converted' line.
-
-					if len(msg_lines) > 0 and (msg_lines[-1] == '\n' or msg_lines[-1] == '\r\n'):
-						msg_lines.pop()
-
-					#EudoraLog.log.warn("Adding attachment with contenttype = " + contenttype)
-					attachments.append( (line, target) )
-				else:
-					embedded_matcher = re_embedded.match ( line )
-					
-					if embedded_matcher:
-						filename = embedded_matcher.group(1)
-						embeddeds.append( filename )
-					else:
-						if scrub_xflowed:
-							line = re.sub(re_xflowed, '', line)
-							line = re.sub(re_xhtml, '', line)
-							line = re.sub(re_pete_stuff, '', line)
-
-						msg_lines.append(strip_linesep(line) + "\n")
-
-				last_file_position = INPUT.tell()
 
 	# Check if the file isn't empty and any messages have been processed.
 	if EudoraLog.line_no == 0:
 		EudoraLog.log.warn( 'empty file' )
 	elif EudoraLog.msg_no == 0:
 		EudoraLog.log.error( 'no messages (not a Eudora mailbox file?)' )
-
-	# For debugging and comparison with a:
-	#
-	# 	'grep "^From ???@???" file.mbx | wc -l | awk '{ print $1 }'
-	#
-	#log_msg ("total number of message(s): $EudoraLog.msg_no")
 
 	print
 
@@ -402,19 +321,107 @@ def convert( mbx, embedded_dir = None, opts = None ):
 
 	return 0
 
-def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
-	"""This function handles the creation of a Python email.message
-	object from the msg_lines and headers lists created during the main
-	loop."""
+def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
+	"""Takes four parameters.  The first is a list of line strings
+	containing the headers and body of a message from a Eudora MBX
+	file.  The second is the offset of the first character in the
+	first line in the msg_lines list within the MBX file we're
+	processing.  The third is the name of the MBX file we're
+	reading.  The fourth, inner_mesg, is a boolean controlling
+	whether or not the pieces were are extracting are a top-level
+	message in the MBX file.  If inner_mesg is true, we will carry
+	out our processing under the assumption that we are handling
+	an attached message carried in an message/rfc822 segment.
+	
+	Returns a tuple (header, body, attachments, embeddeds, mbx)
+	containing a Header object, a body String containing the body
+	of the message, a list of attachment definition tuples, a list
+	of embedded definition tuples, and the name of the MBX file
+	we're processing."""
+
+	headers = Header()
+	body = []
+	attachments = []
+	embeddeds = []
+
+	in_headers = True
+	found_rfc822_inner_mesg = False
+
+	for line in msg_lines:
+		if in_headers:
+			if re_initial_whitespace.match( line ):
+				# Header "folding" (RFC 2822 3.2.3)
+				headers.appendToLast( line )
+			elif len( line.strip() ) != 0:
+				# Message header
+				headers.add_line(line)
+			else:
+				# End of message headers.
+
+				# scrub the header lines we've scanned
+
+				if not inner_mesg:
+					headers.clean(toc_info, msg_offset, replies)
+
+				in_headers = False
+
+				content_type = headers.getValue('Content-Type:')
+
+				if content_type.lower() == 'message/rfc822':
+					found_rfc822_inner_mesg = True
+		elif found_rfc822_inner_mesg:
+			# We're processing a message/rfc822 message,
+			# and so we don't want to process attachments
+			# at this level.  Instead, we want to properly
+			# extract all body lines for later processing
+
+			body.append(strip_linesep(line) + "\n")
+		else:
+			# We're in the body of the text and we need to
+			# handle attachments
+
+			if attachments_dirs and re_attachment.search( line ):
+				# remove the newline that
+				# Eudora inserts before the
+				# 'Attachment Converted' line.
+
+				if len(body) > 0 and (body[-1] == '\n' or body[-1] == '\r\n'):
+					body.pop()
+
+				#EudoraLog.log.warn("Adding attachment with contenttype = " + contenttype)
+				attachments.append( (line, target) )
+			else:
+				embedded_matcher = re_embedded.match ( line )
+					
+				if embedded_matcher:
+					filename = embedded_matcher.group(1)
+					embeddeds.append( filename )
+				else:
+					if scrub_xflowed:
+						line = re.sub(re_xflowed, '', line)
+						line = re.sub(re_xhtml, '', line)
+						line = re.sub(re_pete_stuff, '', line)
+
+					body.append(strip_linesep(line) + "\n")
+
+	return ( header, body, attachments, embeddeds )
+
+def craft_message( headers, body, attachments, embeddeds, mbx):
+	"""This function handles the creation of a Python
+	email.message object from the headers and body lists created
+	during the main loop."""
 
 	global edir
 
+	attachments_ok = False
 	embeddedcids = []
 
-	if msg_lines:
-		msg_text = ''.join(msg_lines)
+	if body:
+		msg_text = ''.join(body)
 	else:
 		msg_text = ''
+
+	is_html = False
 
 	contenttype = headers.getValue('Content-Type:')
 
@@ -430,6 +437,8 @@ def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
 			attachments_ok = False
 			attachments_contenttype = False
 #			print "T",
+	elif re_rfc822.search( contenttype ):
+		message = MIMEMessage(craft_message(extract_pieces(body, last_file_position, mbx, True)))
 	elif not re_multi_contenttype.search( contenttype ):
 		if re_single_contenttype.search ( contenttype ):
 			mimetype = re_single_contenttype.sub( r'\1', contenttype )
@@ -545,15 +554,14 @@ def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
 					embeddedcids.append( (actualcid, embeddeds[embeddedi]) )
 					embeddedi = embeddedi + 1
 					cidi = cidi + 1
+			elif embeddedi < len(embeddeds):
+				embeddedcids.append( (None, embeddeds[embeddedi]) )
+				embeddedi = embeddedi + 1
 			else:
-				if embeddedi < len(embeddeds):
-					embeddedcids.append( (None, embeddeds[embeddedi]) )
-					embeddedi = embeddedi + 1
-				else:
-					# we have more cids than
-					# embeddeds, keep looping
-					# through
-					cidi = cidi + 1
+				# we have more cids than
+				# embeddeds, keep looping
+				# through
+				cidi = cidi + 1
 
 
 		print "\n\nAttaching inline components:"
@@ -575,15 +583,13 @@ def craft_message( msg_lines, headers, attachments, embeddeds, mbx, is_html ):
 
 	set_headers( message, headers )
 
-
 	try:
 		if  not isinstance( message, MIMEMultipart):
 			message.set_payload(msg_text)
+		elif is_html:
+			message.attach(MIMEText(msg_text, _subtype='html'))
 		else:
-			if is_html:
-				message.attach(MIMEText(msg_text, _subtype='html'))
-			else:
-				message.attach(MIMEText(msg_text))
+			message.attach(MIMEText(msg_text))
 	except Exception, e:
 		print "\nHEY HEY HEY message = " + str(msg_text) + "\n"
 		print "Type of message's payload is " + str(type(message.get_payload())) + "\n"
