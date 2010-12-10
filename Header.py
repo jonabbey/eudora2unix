@@ -53,6 +53,9 @@ time_pat = r'\s*(\d{2}:\d{2}:\d{2})\s+(\d{4})\s*([+-]\d{4}){0,1}'
 re_from_date_time = re.compile( date_pat + time_pat )
 re_message_start = re.compile( r'^From' + date_pat + time_pat )
 re_timeout_protection = re.compile( r'^X-(NortonAV|Symantec)-TimeoutProtection' )
+re_between_angles = re.compile( '.*<(.*?)>.*' )
+re_before_parenth = re.compile( '(.*)\(.*?\)' )
+re_after_parenth = re.compile( '\(.*?\)(.*)' )
 
 def strip_linesep( line ):
 	"""Regular expressions proved too slow, and rstrip doesn't take
@@ -319,14 +322,14 @@ class Header:
 
         def clean(self, toc, msg_offset, replies):
             """
-            Processes headers from a Eudora mbx message.  Data is taken
-            from the Header object passed in as 'headers', the TOC_Info
-            object passed as 'toc', and the Replies object passed as
+            Processes headers from a Eudora mbx message.  Data is
+            taken from the self Header object, the TOC_Info object
+            passed as 'toc', and the Replies object passed as
             'replies'.
 
-            Argument headers is a Headers object containing all the headers
-            found in the current message, the offset to the first character of
-            which is in msg_offset.
+	    The msg_offset parameter contains the position of the
+	    first character in the mbx file whose headers we are
+	    processing.
 
             The email for the 'From ' (not 'From: ') header is extracted from
             the first encountered 'From: ' or else 'Sender: ' or else
@@ -349,17 +352,12 @@ class Header:
 
             Uses the toc information with msg_offset to pull out Status and
             Priority info, creates or alters appropriate headers with that info.
-
-            The modified headers are left in the headers param, which is
-            also returned as the return value from this function.
             """
             if self.cleaned:
 		    print "Hey, already cleaned!"
 		    return
 
-            re_between_angles = re.compile( '.*<(.*?)>.*' )
-            re_before_parenth = re.compile( '(.*)\(.*?\)' )
-            re_after_parenth = re.compile( '\(.*?\)(.*)' )
+	    gloabl re_between_angles, re_before_parenth, re_after_parenth
 
             hdr_line0 = self.getValue( 'From ' )	# still has line end
 
