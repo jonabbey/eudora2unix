@@ -9,7 +9,7 @@ import os
 #     verbose =  2  # warnings and errors only
 #     verbose =  3  # logging, warnings and errors
 #
-verbose = 3
+verbose = 2
 
 log = None
 msg_no = 0
@@ -75,7 +75,7 @@ class Log:
 		    self._summary(self.error_msgs, 'error') + os.linesep
 
 	def log(self, msg):
-		self.record(self.mbxname + LOG_SFX, msg, 1)
+		self.record(self.mbxname + LOG_SFX, msg, 3)
 		self.log_msgs += 1
 
 	def warn(self, msg):
@@ -84,7 +84,7 @@ class Log:
 		Log.exit_code = 1
 
 	def error(self, msg):
-		self.record(self.mbxname + ERR_SFX, msg, 3)
+		self.record(self.mbxname + ERR_SFX, msg, 1)
 		self.error_msgs += 1
 		Log.exit_code = 1
 
