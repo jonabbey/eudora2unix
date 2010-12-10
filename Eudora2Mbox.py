@@ -271,6 +271,7 @@ def convert( mbx, embedded_dir = None, opts = None ):
 				newmailbox.add(message)
 			except TypeError:
 				print str(headers)
+				print message.get_content_type()
 				traceback.print_exc(file=sys.stdout)
 
 			EudoraLog.msg_no = EudoraLog.msg_no + 1
@@ -460,20 +461,17 @@ def craft_message( headers, body, attachments, embeddeds, mbx):
 		(myheaders, mybody, myattachments, myembeddeds, mymbx) = extract_pieces(body, -1, mbx, True)
 		print "\n\nbODY1: %s\n--------------------------------------------------\n\nhEADERS2: %s\n\nbODY2: %s\n\nmyattachments: %s, \nmyembeddeds: %s\n" % (''.join(body), myheaders, ''.join(mybody), myattachments, myembeddeds)
 		
-		message = MIMEMessage(craft_message(myheaders, mybody, myattachments, myembeddeds, mymbx))
+		innermessage = craft_message(myheaders, mybody, myattachments, myembeddeds, mymbx)
+
+		print "QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ\n\n%s\n\nRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR\n\n" % (innermessage)
+		message = MIMEMessage(innermessage)
 		print "]",
 	elif not re_multi_contenttype.search( contenttype ):
 		if re_single_contenttype.search ( contenttype ):
 			mimetype = re_single_contenttype.sub( r'\1', contenttype )
 			print "HEYNYEHYHEYSDF mimetype = %s" % (mimetype,)
 			(main, slash, sub) = mimetype.partition( '/' )
-			if main == 'message':
-				print msg_text
-				headers, content = msg_text.split("\r\n\r\n", 1)
-				print "HEY headers = %s\n\nHEY body = %s" % (headers, content)
-				message = MIMEMessage(main, sub)
-			else:
-				message = MIMENonMultipart(main, sub)
+			message = MIMENonMultipart(main, sub)
 			attachments_ok = False
 			attachments_contenttype = False
 			print "X",
@@ -606,12 +604,16 @@ def craft_message( headers, body, attachments, embeddeds, mbx):
 	set_headers( message, headers )
 
 	try:
-		if  not isinstance( message, MIMEMultipart):
-			message.set_payload(msg_text)
-		elif is_html:
-			message.attach(MIMEText(msg_text, _subtype='html'))
-		else:
-			message.attach(MIMEText(msg_text))
+		# rfc822 MIMEMessage objects handle payload management
+		# on constructions, we must not try to do it here.
+
+		if not isinstance( message, MIMEMessage ):
+			if not isinstance( message, MIMEMultipart):
+				message.set_payload(msg_text)
+			elif is_html:
+				message.attach(MIMEText(msg_text, _subtype='html'))
+			else:
+				message.attach(MIMEText(msg_text))
 	except Exception, e:
 		print "\nHEY HEY HEY message = " + str(msg_text) + "\n"
 		print "Type of message's payload is " + str(type(message.get_payload())) + "\n"
@@ -828,7 +830,7 @@ def handle_attachment( line, target, message ):
 			missing_attachments[EudoraLog.log.mbx_name()] = []
 		missing_attachments[EudoraLog.log.mbx_name()].append(attachment_desc)
 
-#		EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
+		EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
 
 		if orig_path in paths_missing:
 			paths_missing[orig_path] = paths_missing[orig_path] + 1
