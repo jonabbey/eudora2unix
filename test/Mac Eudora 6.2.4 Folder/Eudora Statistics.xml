@@ -1,0 +1,404 @@
+<?xml version="1.0"?>
+<EudoraStats>
+	<version>2</version>
+	<startTime>Mon, 13 Dec 2010 00:01:41 -0600</startTime>
+	<junkStartTime>Mon, 13 Dec 2010 00:01:41 -0600</junkStartTime>
+	<currentTime>Mon, 13 Dec 2010 00:03:58 -0600</currentTime>
+
+	<receivedMail>
+		<current>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>1 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>2 0 0 1 0 0 0 0 0 0 0 2</year>
+		</current>
+		<previous>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1</day>
+			<week>0 0 0 1 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</previous>
+		<averageSum>
+			<day>0 0 0 0 0 0 0 1 0 1 0 0 0 0 0 0 2 0 0 0 0 0 0 1</day>
+			<week>0 0 0 2 1 1 0</week>
+			<month>0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</averageSum>
+		<total>5</total>
+	</receivedMail>
+
+	<sentMail>
+		<current>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</current>
+		<previous>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</previous>
+		<averageSum>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</averageSum>
+		<total>0</total>
+	</sentMail>
+
+	<usageSeconds>
+		<current>
+			<day>137 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 137 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 137 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 137</year>
+		</current>
+		<previous>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</previous>
+		<averageSum>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</averageSum>
+		<total>137</total>
+	</usageSeconds>
+
+	<scoredJunk>
+		<current>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</current>
+		<previous>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</previous>
+		<averageSum>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</averageSum>
+		<total>0</total>
+	</scoredJunk>
+
+	<scoredNotJunk>
+		<current>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</current>
+		<previous>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</previous>
+		<averageSum>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</averageSum>
+		<total>0</total>
+	</scoredNotJunk>
+
+	<whiteList>
+		<current>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</current>
+		<previous>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</previous>
+		<averageSum>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</averageSum>
+		<total>0</total>
+	</whiteList>
+
+	<falsePositives>
+		<current>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</current>
+		<previous>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</previous>
+		<averageSum>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</averageSum>
+		<total>0</total>
+	</falsePositives>
+
+	<falseNegatives>
+		<current>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</current>
+		<previous>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</previous>
+		<averageSum>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</averageSum>
+		<total>0</total>
+	</falseNegatives>
+
+	<falseWhiteList>
+		<current>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</current>
+		<previous>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</previous>
+		<averageSum>
+			<day>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</day>
+			<week>0 0 0 0 0 0 0</week>
+			<month>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</month>
+			<year>0 0 0 0 0 0 0 0 0 0 0 0</year>
+		</averageSum>
+		<total>0</total>
+	</falseWhiteList>
+
+	<receivedAttachments>
+		<current>
+			<day>0</day>
+			<week>2</week>
+			<month>2</month>
+			<year>10</year>
+		</current>
+		<previous>
+			<day>2</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</previous>
+		<averageSum>
+			<day>10</day>
+			<week>8</week>
+			<month>8</month>
+			<year>0</year>
+		</averageSum>
+		<total>10</total>
+	</receivedAttachments>
+
+	<sentAttachments>
+		<current>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</current>
+		<previous>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</previous>
+		<averageSum>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</averageSum>
+		<total>0</total>
+	</sentAttachments>
+
+	<readMessages>
+		<current>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</current>
+		<previous>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</previous>
+		<averageSum>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</averageSum>
+		<total>0</total>
+	</readMessages>
+
+	<forwardMessages>
+		<current>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</current>
+		<previous>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</previous>
+		<averageSum>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</averageSum>
+		<total>0</total>
+	</forwardMessages>
+
+	<replyMessages>
+		<current>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</current>
+		<previous>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</previous>
+		<averageSum>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</averageSum>
+		<total>0</total>
+	</replyMessages>
+
+	<redirectMessages>
+		<current>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</current>
+		<previous>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</previous>
+		<averageSum>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</averageSum>
+		<total>0</total>
+	</redirectMessages>
+
+	<usageRead>
+		<current>
+			<day>25</day>
+			<week>25</week>
+			<month>25</month>
+			<year>25</year>
+		</current>
+		<previous>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</previous>
+		<averageSum>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</averageSum>
+		<total>25</total>
+	</usageRead>
+
+	<usageCompose>
+		<current>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</current>
+		<previous>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</previous>
+		<averageSum>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</averageSum>
+		<total>0</total>
+	</usageCompose>
+
+	<usageOther>
+		<current>
+			<day>112</day>
+			<week>112</week>
+			<month>112</month>
+			<year>112</year>
+		</current>
+		<previous>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</previous>
+		<averageSum>
+			<day>0</day>
+			<week>0</week>
+			<month>0</month>
+			<year>0</year>
+		</averageSum>
+		<total>112</total>
+	</usageOther>
+
+</EudoraStats>
