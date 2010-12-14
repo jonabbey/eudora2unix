@@ -135,7 +135,8 @@ re_charset_contenttype = re.compile( r'charset="([^"]+)"', re.IGNORECASE )
 re_boundary_contenttype = re.compile( r'boundary="([^"]+)"', re.IGNORECASE )
 re_contenttype = re.compile( r'content-type', re.IGNORECASE )
 re_xflowed = re.compile( r'</?x-flowed>')
-re_xhtml = re.compile( r'</?x-html>' )
+re_html = re.compile( r'text/html', re.IGNORECASE )
+re_xhtml = re.compile( r'</?x-html>', re.IGNORECASE )
 re_pete_stuff = re.compile( r'<!x-stuff-for-pete[^>]+>' )
 re_filename_cleaner = re.compile( r'^(.*\.\S+).*$' )
 re_cids_finder = re.compile(r'<img src="cid:([^"]+)"', re.IGNORECASE)
@@ -439,6 +440,9 @@ def craft_message( headers, body, attachments, embeddeds, mbx):
 	is_html = False
 
 	contenttype = headers.getValue('Content-Type:')
+
+	if (contenttype and re_html.search(contenttype)) or re_xhtml.search(msg_text):
+		is_html = True
 
 	if not contenttype:
 		msattach = headers.getValue('X-MS-Attachment:')
