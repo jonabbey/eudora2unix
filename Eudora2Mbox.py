@@ -424,7 +424,7 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 						line = re.sub(re_xhtml, '', line)
 						line = re.sub(re_pete_stuff, '', line)
 
-					if orig_line != line and line == '':
+					if orig_line != line and line != '':
 						body.append(strip_linesep(line) + "\n")
 
 	return ( headers, body, attachments, embeddeds, mbx, is_html )
