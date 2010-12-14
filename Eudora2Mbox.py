@@ -130,7 +130,7 @@ re_attachment = re.compile( r'^Attachment converted: (.*)$', re.IGNORECASE )
 re_embedded = re.compile( r'^Embedded Content: ([^:]+):.*' )
 re_rfc822 = re.compile( r'message/rfc822', re.IGNORECASE )
 re_multi_contenttype = re.compile( r'multipart/([^;]+);.*', re.IGNORECASE )
-re_single_contenttype = re.compile( r'^([^;]+);?.*', re.IGNORECASE )
+re_single_contenttype = re.compile( r'^([^/]+)/([^;]+);?.*', re.IGNORECASE )
 re_charset_contenttype = re.compile( r'charset="([^"]+)"', re.IGNORECASE )
 re_boundary_contenttype = re.compile( r'boundary="([^"]+)"', re.IGNORECASE )
 re_contenttype = re.compile( r'content-type', re.IGNORECASE )
@@ -262,9 +262,9 @@ def convert( mbx, embedded_dir = None, opts = None ):
 
 		if msg_lines and (not line or re_message_start.match( line )):
 
-			(headers, body, attachments, embeddeds, mbx) = extract_pieces(msg_lines, last_file_position, mbx)
+			(headers, body, attachments, embeddeds, mbx, is_html) = extract_pieces(msg_lines, last_file_position, mbx)
 
-			message = craft_message(headers, body, attachments, embeddeds, mbx)
+			message = craft_message(headers, body, attachments, embeddeds, mbx, is_html)
 
 			try:
 				newmailbox.add(message)
@@ -357,6 +357,7 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 
 	in_headers = True
 	found_rfc822_inner_mesg = False
+	is_html = False
 
 	if not inner_mesg:
 		headers.add( 'From ', msg_lines[0][5:].strip() )
@@ -383,7 +384,6 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 
 				if content_type and content_type.lower() == 'message/rfc822':
 					found_rfc822_inner_mesg = True
-
 					print "+",
 		elif found_rfc822_inner_mesg:
 			# We're processing a message/rfc822 message,
@@ -395,6 +395,9 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 		else:
 			# We're in the body of the text and we need to
 			# handle attachments
+
+			if not is_html and re_xhtml.search( line ):
+				is_html = True
 
 			if attachments_dirs and re_attachment.search( line ):
 				# remove the newline that
@@ -420,9 +423,9 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 
 					body.append(strip_linesep(line) + "\n")
 
-	return ( headers, body, attachments, embeddeds, mbx )
+	return ( headers, body, attachments, embeddeds, mbx, is_html )
 
-def craft_message( headers, body, attachments, embeddeds, mbx):
+def craft_message( headers, body, attachments, embeddeds, mbx, is_html):
 	"""This function handles the creation of a Python
 	email.message object from the headers and body lists created
 	during the main loop."""
@@ -437,11 +440,21 @@ def craft_message( headers, body, attachments, embeddeds, mbx):
 	else:
 		msg_text = ''
 
-	is_html = False
+	# there's no point honoring 'multipart' if we don't have any
+	# attachments or embeddeds to attach, so we'll pay most
+	# attention to whether we have any attachments or embeddeds
+	# defined for this message
+
+	if attachments or embeddeds:
+		is_multipart = True
+	else:
+		is_multipart = False
+
+	message = None
 
 	contenttype = headers.getValue('Content-Type:')
 
-	if (contenttype and re_html.search(contenttype)) or re_xhtml.search(msg_text):
+	if contenttype and re_html.search(contenttype):
 		is_html = True
 
 	if not contenttype:
@@ -452,7 +465,10 @@ def craft_message( headers, body, attachments, embeddeds, mbx):
 			attachments_ok = "Dunno"
 			attachments_contenttype = "Still Dunno"
 		else:
-			message = MIMENonMultipart('text', 'plain')
+			if is_html:
+				message = MIMENonMultipart('text', 'html')
+			else:
+				message = MIMENonMultipart('text', 'plain')
 			attachments_ok = False
 			attachments_contenttype = False
 			print "T",
@@ -460,16 +476,38 @@ def craft_message( headers, body, attachments, embeddeds, mbx):
 		print "[",
 		message = MIMEMessage(craft_message(*extract_pieces(body, -1, mbx, True)))
 		print "]",
-	elif not re_multi_contenttype.search( contenttype ):
-		if re_single_contenttype.search ( contenttype ):
-			mimetype = re_single_contenttype.sub( r'\1', contenttype )
-			(main, slash, sub) = mimetype.partition( '/' )
-			message = MIMENonMultipart(main, sub)
+	elif not is_multipart:
+		mimetype = re_single_contenttype.search( contenttype )
+
+		if mimetype:
+			main = mimetype.group(1)
+			sub = mimetype.group(2)
+
+			if main != 'multipart':
+				message = MIMENonMultipart(main, sub)
+				attachments_ok = False
+				attachments_contenttype = False
+				print "X",
+			else:
+				# I've seen some messages in Eudora
+				# mailboxes that label themselves as
+				# multitype/related without having any
+				# attachments ever declared in the
+				# Eudora box.
+				#
+				# By passing here, we allow the next
+				# clause to go ahead and create an
+				# appropriate MIMENonMultipart
+
+				pass
+
+		if not message:
+			if is_html:
+				message = MIMENonMultipart('text', 'html')
+			else:
+				message = MIMENonMultipart('text', 'plain')
 			attachments_ok = False
 			attachments_contenttype = False
-			print "X",
-		else:
-			print "*** %s" % (contenttype,)
 	else:
 		subtype = re_multi_contenttype.search( contenttype )
 		if subtype:
