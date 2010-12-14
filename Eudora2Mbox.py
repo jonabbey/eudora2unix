@@ -416,12 +416,15 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 					filename = embedded_matcher.group(1)
 					embeddeds.append( filename )
 				else:
+					orig_line = line
+
 					if scrub_xflowed:
 						line = re.sub(re_xflowed, '', line)
 						line = re.sub(re_xhtml, '', line)
 						line = re.sub(re_pete_stuff, '', line)
 
-					body.append(strip_linesep(line) + "\n")
+					if orig_line != line and line == '':
+						body.append(strip_linesep(line) + "\n")
 
 	return ( headers, body, attachments, embeddeds, mbx, is_html )
 
