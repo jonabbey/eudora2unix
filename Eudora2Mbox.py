@@ -291,17 +291,18 @@ def convert( mbx, embedded_dir = None, opts = None ):
 	elif EudoraLog.msg_no == 0:
 		EudoraLog.log.error( 'no messages (not a Eudora mailbox file?)' )
 
-	print
+	if False:
+		print
 
-	print "\nMissing path count:"
+		print "\nMissing path count:"
 
-	for (path, count) in paths_missing.iteritems():
-		print "%s: %d" % (path, count)
+		for (path, count) in paths_missing.iteritems():
+			print "%s: %d" % (path, count)
 
-	print "\nFound path count:"
+		print "\nFound path count:"
 
-	for (path, count) in paths_found.iteritems():
-		print "%s: %d" % (path, count)
+		for (path, count) in paths_found.iteritems():
+			print "%s: %d" % (path, count)
  
 	print "\n------------------------------"
 	print "Attachments Listed: %d\nAttachments Found: %d\nAttachments Missing:%d" % (attachments_listed, attachments_found, attachments_missing)
@@ -864,7 +865,7 @@ def handle_attachment( line, target, message ):
 			missing_attachments[EudoraLog.log.mbx_name()] = []
 		missing_attachments[EudoraLog.log.mbx_name()].append(attachment_desc)
 
-		# EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
+		EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
 
 		if orig_path in paths_missing:
 			paths_missing[orig_path] = paths_missing[orig_path] + 1
