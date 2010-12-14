@@ -1,0 +1,198 @@
+From jonabbey@ganymeta.org Sun Dec 12 21:45:32 2010
+Return-Path: <jonabbey@ganymeta.org>
+Received: from ns5.arlut.utexas.edu (ns5.arlut.utexas.edu [10.4.1.6])
+	by ns8.arlut.utexas.edu (8.13.1/8.13.1) with ESMTP id oBD3jWQu028683
+	for <broccol@arlmail.arlut.utexas.edu>; Sun, 12 Dec 2010 21:45:32 -0600
+Received: from ns2.arlut.utexas.edu (ns2.arlut.utexas.edu [146.6.211.1])
+	by ns5.arlut.utexas.edu (8.13.8/8.13.8) with ESMTP id oBD3jVA0001155
+	for <jonabbey@arlut.utexas.edu>; Sun, 12 Dec 2010 21:45:32 -0600
+Received: from ganymeta.org (greatland.ganymeta.org [71.41.152.220])
+	by ns2.arlut.utexas.edu (8.13.8/8.13.8) with ESMTP id oBD3jPlU007442
+	for <jonabbey@arlut.utexas.edu>; Sun, 12 Dec 2010 21:45:31 -0600
+Received: from ganymeta.org (localhost [127.0.0.1])
+	by ganymeta.org (8.14.4/8.14.3) with ESMTP id oBD3jJw7018289;
+	Sun, 12 Dec 2010 21:45:20 -0600
+Received: (from jonabbey@localhost)
+	by ganymeta.org (8.14.4/8.14.4/Submit) id oBD3jJdb018288;
+	Sun, 12 Dec 2010 21:45:19 -0600
+Date: Sun, 12 Dec 2010 21:45:18 -0600
+From: Jon Abbey <jonabbey@ganymeta.org>
+To: Steve White <stevan_white@hotmail.com>
+Cc: Jon Abbey <jonabbey@ganymeta.org>, jonabbey@arlut.utexas.edu
+Subject: Re: Eudora2Unix collaboration?
+Message-ID: <20101213034518.GA18260@ganymeta.org>
+References: <20101211053111.GA6847@ganymeta.org>
+ <SNT120-W603FCA138A318CAB1CB701EC100@phx.gbl>
+ <20101212012405.GA11508@ganymeta.org>
+ <SNT120-W516B39A76CB75AF65369CBEC110@phx.gbl>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="5vNYLRcllDrimb99"
+Content-Disposition: inline
+In-Reply-To: <SNT120-W516B39A76CB75AF65369CBEC110@phx.gbl>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-PMX-Version: 5.6.0.2009776, Antispam-Engine: 2.7.2.376379, Antispam-Data: 2010.12.13.33315
+X-PerlMx-Spam: Gauge=IIIIIIII, Probability=8%, Report='
+ BODY_SIZE_6000_6999 0, BODY_SIZE_7000_LESS 0, DATE_TZ_NA 0, OEM_SOFTWARE_X1 0, __BOUNCE_CHALLENGE_SUBJ 0, __BOUNCE_NDR_SUBJ_EXEMPT 0, __CD 0, __CP_MEDIA_BODY 0, __CP_URI_IN_BODY 0, __CT 0, __CTYPE_HAS_BOUNDARY 0, __CTYPE_MULTIPART 0, __HAS_MSGID 0, __MIME_VERSION 0, __OEM_SOFTWARE_1 0, __PHISH_FROM 0, __PHISH_FROM2 0, __SANE_MSGID 0, __TO_MALFORMED_2 0, __URI_NS , __USER_AGENT 0'
+Status: RO
+Content-Length: 5866
+Lines: 157
+
+
+--5vNYLRcllDrimb99
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sun, Dec 12, 2010 at 03:32:52PM +0100, Steve White wrote:
+|
+| > Unfortunately, I haven't acquired a copy of Eudora for myself yet, and
+| > I didn't generate any test files. All the mail that I was processing
+| > from Eudora is sensitive and I can't share any of it.
+| >
+| > I can download a few versions of Eudora from
+| >
+| > http://www.eudora.com/techsupport/kb/2350hq.html
+| >
+| > and use them with some test accounts on our IMAP/POP server to get it
+| > to generate some MBX files and test with them next week, though.
+|=20
+| That is exactly what I have in mind.
+
+Okay.  I have a couple of Mac OS X systems at home that I'll get some
+test boxes set up in tonight.  At work I use Linux, but I have access
+to a Windows Vista system I can use to generate some mailboxes.
+
+| > Here is what I have it supporting now, though:
+| >
+| > Re-connection of attachments with MIME
+| >
+| > Limited re-connection of embedded images for HTML emails that use
+| > cid: URIs in tags to reference Embedded images. I don't have
+| > it reconnecting embedded background images, and in any event it's
+| > not working if the tags don't use cid: URIs.
+| >
+| > (In order to do the above, I actually had to incorporate Python's
+| > HTML parser into the code so that it can find those cid: URIs to
+| > properly label the embedded images when it attaches them to the
+| > messages being convereted.)
+| >
+| > Support for message/rfc822 type emails that contain forwarded
+| > emails, which can carry their own attachments or embedded images.
+| >
+| > I have it set up to support multiple attach directories as well.. the
+| > Eudora mailboxes I was working with stretched across like 15 years of
+| > usage across many revisions and on both Mac and Windows, and the
+| > attachments came to me in several directories, each dating back to
+| > different eras of Eudora usage. ;-/
+|=20
+| This is part of the sort of documentation I would want to see.
+|=20
+| I would only say, look at it from a user's point of view, who maybe
+| does't know python, or the protocols and all, and give a quick=20
+| explanation to make it clear how these changes affect them.
+|=20
+| Could you go ahead and update the existing documentation?
+
+Sure.  Are you comfortable using Git, or should I be using something
+else for revision control?
+
+| I'm considering just calling your alterations a new major release.
+
+Fine by me.  Especially with, you know, a test suite. ;-)
+
+Speaking of test suite, do you have a Python unit testing framework
+that you like?  I've created my own test framework in Java for one
+product, and I'm familiar with JUnit, but I don't know what the go-to
+framework is in Python.
+
+| > | Does your new version still support mbox and KMail?
+| >
+| > No, right now I just made it use the Python mailbox class to generate
+| > mbox style mailboxes.
+| >
+| > The mailbox formats supported by the mailbox module in the Python
+| > version I have are:
+| >
+| > Maildir
+| > mbox
+| > MMDF mailbox
+| > MH mailbox
+| > An Rmail-style Babyl mailbox
+|=20
+| OK.  Well, I'm not sure what to do about that.  It's not a killer for me.
+| and anyway, one would hope that if anybody cared enough, they
+| could write a Python module to make Kmail mailboxes.
+|=20
+| I think pine uses mbox.
+|=20
+| But there are some Kmail users (although the number of those=20
+| converting from Eudora may be 0)
+|=20
+| > It would only be the matter of a few lines of code to allow the user
+| > to choose which of these mailbox formats they wanted to get out the
+| > other ends.
+|=20
+| This would be good.
+|=20
+| > The precise interpretation of the Status: headers, etc., aren't
+| > affected by these mailbox formats, though. I've been telling it to
+| > use the 'pine' method for handling its headers, as opposed to kmail,
+| > but I don't use either pine or kmail, so I'm not sure whether I might
+| > have damaged that code along the way.
+| >
+| > In any event, the code that I sent last time definitely needs some
+| > testing and cleanup.  For instance, it is still making an unnecessary
+| > copy of the directory to be converted, even though it is creating the
+| > new mailbox files as it goes. It would be better if it just read from
+| > the Eudora directory, the embedded directory and the attachment
+| > directory or directories and then wrote the mailbox files out to a new
+| > directory.
+|=20
+| I spent days testing the versions that are there (and still there were
+| a few glitches.)   Difference between night and day: a clean, simple,
+| systematic test suite.
+|=20
+| I remember at the time, besides my own mail, I had some simple mailboxes
+| with specific properties.  Maybe I kept some of them.  I'll have a look.
+
+That would be great.
+
+| Concise!  Golly, that's the nicest thing anybody said to me all week!
+
+Well, I'm primarily a Java programmer.  Your eudora2unix code felt
+awfully concise to me. ;-)
+
+| I did try to assess what was there, but unfortunately, you have altered
+| almost every line, so diff is of no help.
+|
+| I'll scan through it to see if anything catches my eye.
+| But I'm more interested in seeing results from a test.
+
+Okay, I'll see what I can get to you.
+
+ Jon
+
+--
+---------------------------------------------------------------------------=
+----
+Jonathan Abbey                                            jonabbey@ganymeta=
+=2Eorg
+Austin, TX                                             http://www.ganymeta.=
+org/
+GPG Key: 50D3B73B at keyserver pgp.mit.edu, http://www.ganymeta.org/homekey=
+=2Egpg
+
+--5vNYLRcllDrimb99
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk0Fls4ACgkQSKru5FDTtztUwQCaApt7SOCmGf3YB8To0I9EEuvr
+AicAoNSXTLChBbGojcNC2zOJEL+sKYff
+=2Bih
+-----END PGP SIGNATURE-----
+
+--5vNYLRcllDrimb99--
+

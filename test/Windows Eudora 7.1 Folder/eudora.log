@@ -1,0 +1,177 @@
+
+Mon Dec 13 18:44:22 2010
+Version 7.1.0.9
+LogLevel 25759 (0x649F)
+Mode 0
+MAIN   128: 0.00 LOGNULL JJFileMT::Open() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 0
+MAIN   128: 0.00 LOGNULL JJFileMT::Close() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 0
+MAIN   128: 0.00 LOGNULL JJFileMT::Open() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\Out.mbx, Size: 0
+MAIN   128: 0.00 LOGNULL JJFileMT::Close() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\Out.mbx, Size: 0
+MAIN   128: 0.00 LOGNULL JJFileMT::Open() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\Trash.mbx, Size: 0
+MAIN   128: 0.00 LOGNULL JJFileMT::Close() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\Trash.mbx, Size: 0
+MAIN    16: 0.01 Building mailbox 'Out' table of contents
+MAIN   128: 0.01 Leeway 10, Out: MBX 1292287462, TOC 1292287463
+MAIN   128: 0.01 Out .mbx size: MBX 0, TOC 1
+MAIN     8: 0.01 Dialog: "Eudora is not currently the default mail program.\n"
+MAIN     8: 0.01 Dialog: "\n"
+MAIN     8: 0.01 Dialog: "Would you like it to be the default mail program?"
+MAIN     8: 0.05 Dialog: "Without a registration code, this copy will start off in Sponsored mode.  Sponsored mode contains many of the features found in Paid Mode, but it does not include SpamWatch, ultra-fast search or BossWatch."
+MAIN     8: 0.07 Dialog: "Dismissed with 1"
+MAIN    16: 0.29 Establishing Network Connection...
+MAIN    16: 0.29 Resolving address for "mailboxes.arlut.utexas.edu"
+MAIN    16: 0.29 Contacting ns8.arlut.utexas.edu (10.4.32.1)
+MAIN    16: 0.29 Open 10.4.32.1:110
+MAIN    16: 0.29 Closing connection
+MAIN    16: 0.37 Establishing Network Connection...
+MAIN    16: 0.37 Resolving address for "mail.arlut.utexas.edu"
+MAIN    16: 0.37 Contacting mail.arlut.utexas.edu (10.4.1.6)
+MAIN    16: 0.37 Open 10.4.1.6:25
+MAIN    16: 0.37 Closing connection
+MAIN    16: 0.45 Building mailbox 'Junk' table of contents
+4496    16: 0.45 Open 10.4.32.1:110
+MAIN   128: 0.49 LOGNULL JJFileMT::Open() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 0
+MAIN    16: 0.49 Building mailbox 'In' table of contents
+MAIN   128: 0.49 LOGNULL JJFileMT::Close() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 0
+MAIN   128: 0.56 Leeway 10, Junk: MBX 1292287469, TOC 1292287507
+MAIN   128: 0.56 Junk .mbx size: MBX 0, TOC 1
+4496     8: 0.59 Dialog: "SSL Negotiation Failed: Certificate Error: Unknown and unprovided root certificate.\r\n"
+4496     8: 0.59 Dialog: "Certificate bad: Destination Host name does not match  host name in certificate\r\n"
+4496     8: 0.59 Dialog: "But ignoring this error because Certificate is trusted\r\n"
+4496     8: 0.59 Dialog: "The connection with the server has been lost.\r\n"
+4496     8: 0.59 Dialog: "\r\n"
+4496     8: 0.59 Dialog: "\r\n"
+4496     8: 0.59 Dialog: "Cause:  (207)"
+MAIN   128: 0.59 Leeway 10, In: MBX 1292287462, TOC 1292287511
+MAIN   128: 0.59 In .mbx size: MBX 0, TOC 1
+5444    16: 1.06 Open 10.4.32.1:110
+5444  8192: 1.07 UIDL 1 4d05b14e0000000d 2007406488
+5444  8192: 1.07 UIDL 2 4d05b14e0000000e 2007406489
+5444  8192: 1.07 UIDL 3 4d05b14e0000000f 2007406490
+5444  8192: 1.07 UIDL 4 4d05b14e00000010 2007406692
+5444  8192: 1.07 UIDL 5 4d05b14e00000011 2007406693
+5444  8192: 1.07 Begin reconciling LMOS lists for noname@nomachine.nodomain
+5444  8192: 1.07 New 1 hash 2007406488 gmt 4D0669C9 flags 0x1252 F r k s d
+5444  8192: 1.07 New 2 hash 2007406489 gmt 4D0669C9 flags 0x1252 F r k s d
+5444  8192: 1.07 New 3 hash 2007406490 gmt 4D0669C9 flags 0x1252 F r k s d
+5444  8192: 1.07 New 4 hash 2007406692 gmt 4D0669C9 flags 0x1252 F r k s d
+5444  8192: 1.07 New 5 hash 2007406693 gmt 4D0669C9 flags 0x1252 F r k s d
+5444  8192: 1.07 Done reconciling LMOS lists for noname@nomachine.nodomain
+5444  8192: 1.07 Writing LMOS file for noname@nomachine.nodomain
+5444  8192: 1.07 Msg 1 hash 2007406488 gmt 4D0669C9 flags 0x1252 F r k s d
+5444  8192: 1.07 Msg 2 hash 2007406489 gmt 4D0669C9 flags 0x1252 F r k s d
+5444  8192: 1.07 Msg 3 hash 2007406490 gmt 4D0669C9 flags 0x1252 F r k s d
+5444  8192: 1.07 Msg 4 hash 2007406692 gmt 4D0669C9 flags 0x1252 F r k s d
+5444  8192: 1.07 Msg 5 hash 2007406693 gmt 4D0669C9 flags 0x1252 F r k s d
+5444  8192: 1.07 Begin fetching messages for : eudtest@mailboxes.arlut.utexas.edu
+5444  8192: 1.07 Done fetching messages for : eudtest@mailboxes.arlut.utexas.edu
+5444  8192: 1.07 Backing up LMOS file for noname@nomachine.nodomain
+5444   128: 1.07 Backed up "C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\spool\lmos.dat" to "C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\spool\lmos.dat.001" (0)
+5444  8192: 1.07 Writing LMOS file for noname@nomachine.nodomain
+5444  8192: 1.07 Msg 1 hash 2007406488 gmt 4D0669C9 flags 0x128C f R k s t
+5444  8192: 1.07 Msg 2 hash 2007406489 gmt 4D0669C9 flags 0x128C f R k s t
+5444  8192: 1.07 Msg 3 hash 2007406490 gmt 4D0669C9 flags 0x128C f R k s t
+5444  8192: 1.07 Msg 4 hash 2007406692 gmt 4D0669C9 flags 0x128C f R k s t
+5444  8192: 1.07 Msg 5 hash 2007406693 gmt 4D0669C9 flags 0x128C f R k s t
+5444  8192: 1.07 Begin purging messages for : eudtest@mailboxes.arlut.utexas.edu
+5444  8192: 1.07 Done purging messages for : eudtest@mailboxes.arlut.utexas.edu
+5444  8192: 1.07 Writing LMOS file for noname@nomachine.nodomain
+5444  8192: 1.07 Msg 1 hash 2007406488 gmt 4D0669C9 flags 0x128C f R k s t
+5444  8192: 1.07 Msg 2 hash 2007406489 gmt 4D0669C9 flags 0x128C f R k s t
+5444  8192: 1.07 Msg 3 hash 2007406490 gmt 4D0669C9 flags 0x128C f R k s t
+5444  8192: 1.07 Msg 4 hash 2007406692 gmt 4D0669C9 flags 0x128C f R k s t
+5444  8192: 1.07 Msg 5 hash 2007406693 gmt 4D0669C9 flags 0x128C f R k s t
+MAIN   128: 1.07 LOGNULL JJFileMT::Open() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 0
+MAIN    16: 1.07 Preparing new messages to display: 5
+MAIN    16: 1.07 Jonathan Abbey, Email Attachment Test
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(1361)
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(1361)
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(1361)
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(1974) 2
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL GenericReader::ReadIt() JJFileMT::Truncate(1976)
+MAIN    16: 1.07 Decoding "c:\users\broccol\appdata\roaming\qualcomm\eudora\attach\stevan_white"...
+MAIN   128: 1.07 LOGNULL GenericReader::ReadIt() JJFileMT::Truncate(8350) 2
+MAIN    16: 1.07 Jonathan Abbey, Email Attachment Test
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(2072) 5
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL GenericReader::ReadIt() JJFileMT::Truncate(2072)
+MAIN    16: 1.07 Decoding "c:\users\broccol\appdata\roaming\qualcomm\eudora\attach\Email Attachment Test"...
+MAIN   128: 1.07 LOGNULL GenericReader::ReadIt() JJFileMT::Truncate(205) 2
+MAIN    16: 1.07 Jonathan Abbey, Email Attachment Test
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(2177) 5
+MAIN     2: 1.07 Successfully retrieved Jonathan Abbey, Email Attachment Test
+MAIN    16: 1.07 Preparing new messages to display: 4
+MAIN    16: 1.07 The Department of Computer Scie, UT Department of Computer Scien
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(5339)
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(5339)
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(8402) 2
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(5339) 2
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(5339)
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(10938) 2
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(10951) 5
+MAIN     2: 1.07 Successfully retrieved The Department of Computer Scie, UT Department of Computer Scien
+MAIN    16: 1.07 Preparing new messages to display: 3
+MAIN    16: 1.07 Austin Dental Arts, Appointment reminder from Austi
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(14331)
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(14331)
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(14331)
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(15624) 2
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(14331) 2
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(14331)
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(19838) 2
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(19851) 5
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL GenericReader::ReadIt() JJFileMT::Truncate(19851)
+MAIN    16: 1.07 Decoding "C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\Embedded\Appointment reminder from Austi.jpg"...
+MAIN    16: 1.07 Austin Dental Arts, Appointment reminder from Austi
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(19853) 5
+MAIN     2: 1.07 Successfully retrieved Austin Dental Arts, Appointment reminder from Austi
+MAIN    16: 1.07 Preparing new messages to display: 2
+MAIN    16: 1.07 Jonathan Abbey, This is a test
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(20905)
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(20905)
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(20967) 2
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL GenericReader::ReadIt() JJFileMT::Truncate(20982)
+MAIN    16: 1.07 Decoding "c:\users\broccol\appdata\roaming\qualcomm\eudora\attach\tools.arlut.utexas.edugash2.htm"...
+MAIN   128: 1.07 LOGNULL GenericReader::ReadIt() JJFileMT::Truncate(5708) 2
+MAIN    16: 1.07 Jonathan Abbey, This is a test
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(21097) 5
+MAIN     2: 1.07 Successfully retrieved Jonathan Abbey, This is a test
+MAIN    16: 1.07 Preparing new messages to display: 1
+MAIN    16: 1.07 Jonathan Abbey, Another email test
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(22063)
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(22063)
+MAIN   128: 1.07 LOGNULL TextReader::ReadIt() JJFileMT::Truncate(22580) 2
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() calling ::ReadIt()
+MAIN   128: 1.07 LOGNULL GenericReader::ReadIt() JJFileMT::Truncate(22593)
+MAIN    16: 1.07 Decoding "C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\Embedded\kate_halloween.jpg"...
+MAIN    16: 1.07 Jonathan Abbey, Another email test
+MAIN   128: 1.07 LOGNULL MultiReader::ReadIt() JJFileMT::Truncate(22595) 5
+MAIN     2: 1.07 Successfully retrieved Jonathan Abbey, Another email test
+MAIN    16: 1.07 Preparing new messages to display: 0
+MAIN   128: 1.07 LOGNULL JJFileMT::Close() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 22672
+MAIN    16: 1.07 Building mailbox 'Trash' table of contents
+MAIN    16: 1.07 Jonathan Abbey, Another email test
+MAIN     8: 1.07 Dialog: "You have new mail!"
+MAIN     8: 1.09 Dialog: "Dismissed with 1"
+MAIN   128: 1.09 LOGNULL JJFileMT::Open() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 22672
+MAIN   128: 1.09 LOGNULL JJFileMT::Close() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 22672
+MAIN   128: 1.12 LOGNULL JJFileMT::Open() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 22672
+MAIN   128: 1.12 LOGNULL JJFileMT::Close() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 22672
+MAIN   128: 1.17 LOGNULL JJFileMT::Open() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 22672
+MAIN   128: 1.17 LOGNULL JJFileMT::Close() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 22672
+MAIN   128: 1.20 LOGNULL JJFileMT::Open() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 22672
+MAIN   128: 1.20 LOGNULL JJFileMT::Close() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 22672
+MAIN   128: 1.23 LOGNULL JJFileMT::Open() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 22672
+MAIN   128: 1.23 LOGNULL JJFileMT::Close() C:\Users\broccol\AppData\Roaming\Qualcomm\Eudora\In.mbx, Size: 22672
+MAIN 25759: 1.28 Logging shutdown
