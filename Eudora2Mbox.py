@@ -269,6 +269,7 @@ def convert( mbx, embedded_dir = None, opts = None ):
 			message = craft_message(headers, body, attachments, embeddeds, mbx, is_html)
 
 			try:
+				message_count = message_count + 1
 				newmailbox.add(message)
 			except TypeError:
 				print str(headers)
