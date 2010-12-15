@@ -128,6 +128,7 @@ message_count = 0
 re_quoted_attachment = re.compile( r'^Attachment converted: "([^"]*)"\s*$', re.IGNORECASE )
 re_attachment = re.compile( r'^Attachment converted: (.*)$', re.IGNORECASE )
 re_embedded = re.compile( r'^Embedded Content: ([^:]+):.*' )
+re_mangled_mac = re.compile( r'#[0-9a-zA-Z]{5}\.[^.]+$' )
 re_rfc822 = re.compile( r'message/rfc822', re.IGNORECASE )
 re_multi_contenttype = re.compile( r'multipart/([^;]+);.*', re.IGNORECASE )
 re_single_contenttype = re.compile( r'^([^/]+)/([^;]+);?.*', re.IGNORECASE )
@@ -158,6 +159,7 @@ paths_missing = {}
 missing_attachments = {}
 found_attachments = {}
 attachments_dirs = []
+mac_mismatches = []
 
 target = None
 toc_info = None
@@ -291,7 +293,7 @@ def convert( mbx, embedded_dir = None, opts = None ):
 	elif EudoraLog.msg_no == 0:
 		EudoraLog.log.error( 'no messages (not a Eudora mailbox file?)' )
 
-	if False:
+	if True:
 		print
 
 		print "\nMissing path count:"
@@ -714,6 +716,7 @@ def handle_attachment( line, target, message ):
 	global attachments_listed, attachments_found, attachments_missing, attachments_dirs
 	global paths_found, paths_missing
 	global missing_attachments, found_attachments
+	global mac_mismatches
 
 	attachments_listed = attachments_listed + 1
 
@@ -866,6 +869,10 @@ def handle_attachment( line, target, message ):
 		missing_attachments[EudoraLog.log.mbx_name()].append(attachment_desc)
 
 		EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
+
+		if re_mangled_mac.search(filename):
+			print "Mac pattern: %s" % (filename, )
+			mac_mismatches.append(filename)
 
 		if orig_path in paths_missing:
 			paths_missing[orig_path] = paths_missing[orig_path] + 1

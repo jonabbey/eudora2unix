@@ -372,6 +372,7 @@ def scan_attachment_dirs(attachments_dirs):
 		attachments_not_handled = attachments_not_handled.union(fullpaths)
 
 def show_attachment_stats():
+	"""Writes a report on attachment handling to attachlog.txt."""
 
 	global attachments_not_handled, attachments_handled_by
 
@@ -435,6 +436,17 @@ def show_attachment_stats():
 		OUT.write("                         Total Number of Attachments Successfully Found: " + str(total_attachments_found) + "\n")
 		OUT.write("                         Total Count of Attachments Referenced in Email That Are Missing : " + str(total_missing) + "\n")
 		OUT.write("------------------------------------------------------------------------------------------------------------------------\n")
+
+		OUT.write("\n------------------------------------------------------------------------------------------------------------------------\n")
+		OUT.write("                                           Mangled Mac Names\n\n")
+
+		i = 1
+		for filename in Eudora2Mbox.mac_mismatches:
+			OUT.write(str(i) + ".   " + filename + "\n")
+			i = i+1
+
+		OUT.write("------------------------------------------------------------------------------------------------------------------------\n")
+
 	finally:
 		OUT.close()
 
