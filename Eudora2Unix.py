@@ -383,8 +383,12 @@ def show_attachment_stats():
 	total_missing = 0
 	total_attachments_listed = 0
 	total_attachments_found = 0
+	
+	attachlog = "/VOLUMES/huckabay/attachlog.txt"
 
-	OUT = open ( "/VOLUMES/huckabay/attachlog.txt", 'w')
+	print "\nWriting attachment statistics to %s\n" % (attachlog,)
+
+	OUT = open ( attachlog, 'w')
 
 	try:
 		for k in common_names:
