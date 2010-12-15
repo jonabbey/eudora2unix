@@ -869,7 +869,7 @@ def handle_attachment( line, target, message ):
 			missing_attachments[EudoraLog.log.mbx_name()] = []
 		missing_attachments[EudoraLog.log.mbx_name()].append(attachment_desc)
 
-		EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
+#		EudoraLog.log.warn(" FAILED to find attachment: \'" + attachment_desc + "\'" )
 
 		if re_mangled_mac.search(filename):
 			print "Mac pattern: %s" % (filename, )
