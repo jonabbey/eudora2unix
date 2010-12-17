@@ -1,4 +1,15 @@
-Testing git
+12/16 10 *.py - Version 2.0
+	Major restructuring of scripts.  Separated out Header.py and
+	EudoraLog.py from Eudora2Mbox.py.  Added support for stitching
+	attachments and embedded images into converted mailboxes with
+	MIME.
+
+	Added support for generating any mailbox type support by
+	Python mailbox class, including mbox, maildir, MH, MMDF, Babyl.
+
+	Added test cases for Mac Eudora 6.2.4 and Windows Eudora 7.1.
+
+	Updated html docs.
 
 04/29 03 Eudora2Mbox.py
 	Improved attachment code so that if the attachment appeared

@@ -49,8 +49,13 @@ Tested on
 </h2>
 <ul>
 <li>
+	Eudora v 7.1 Windows
+</li>
+<li>
 	Eudora v 5 Windows
 </li>
+<li>
+	Eudora v 6.2.4 Mac
 <li>
 	Eudora Lite v 3.1.3 Mac
 </li>
@@ -283,7 +288,7 @@ deletion.
 </table>
 
 <h2>
-Attachments
+Attachments and Embedded Content
 </h2>
 
 <p>
@@ -303,29 +308,35 @@ the unix side.
 </p>
 
 <p>
-The latter is certainly easier, and it's what I've done.  Eudora2Unix
-creates a URI to a file<br />
-<code class="indent">file://$HOME/maildir/attach/binary</code><br />
-Where attach is the argument of the <code>-a</code> flag passed to
-Eudora2Unix,
-and should correspond to the name of the Eudora attachments folder.
-Note this folder should be re-named to have no spaces.  For Mac
-mail directories, Eudora2Unix also avoids processing this folder as
-a mail folder (since Mac mailbox names have no extensions, there's no
-other way for Eudora2Unix to distinguish between mailboxes and other
-binaries).
+Eudora2Unix does the former.  Attachment files are converted to MIME
+attachments and are merged with the message body text from the mbx
+file to create a multi-part MIME message in the resulting mailbox.
+The MIME types assigned to attachments are assigned using the Python
+mimetypes module, which uses a database of known file name extensions
+to guess the appropriate MIME type for an attachment.  If the
+attachment's MIME type cannot be guessed from its filename, it will be
+assigned a generic MIME type of application/octet-stream.
 </p>
 
 <p>
-It makes the attachment 'clickable' only in Pine, and only if the
-file path contains no spaces.  I have contacted both the Pine and
-Kmail developers about this issue.  There is no reason why this
-method should not work well.
+Embedded images are handled in a similar fashion.  Eudora2Unix will
+take embedded images referenced by a <br />
+<code class="indent">Embedded Content: filepath</code><br /> line in
+an MBX file and merge them with the message's body text as a multipart
+MIME message.  Unfortunately, Eudora doesn't do a very good job of
+keeping track of what embedded images go along with which content id
+(cid) URIs referenced in an HTML message.  To re-connect images with
+the &lt;img&gt; tags in HTML messages, Eudora2Unix will attempt to
+parse the HTML to find &lt;img&gt; tags whose src attributes use the
+"cid:" URL type.  If an HTML message's text fails to parse as correct
+HTML, Eudora2Unix will make a second attempt to find cid: URLs by
+using a simpler and riskier regular expression match.
 </p>
 
-<p>
-Note that it makes some sense for this directory to be invisible
-to Pine, so a name like '<kbd>.attachments</kbd>' is good.
+<p>If cid: URLs can't be found (or too few are found) in the HTML of a
+message, any embedded images that can't be connected to specific
+content ids in the message text will be attached as ordinary
+attachments.
 </p>
 
 <h2>
@@ -384,13 +395,6 @@ To Do
 </h2>
 <dl>
 <dt>
-Attachments
-</dt>
-<dd>
-	Re-encode and insert into mbox?
-	Just get Pine and Kmail to view file URI's properly?
-</dd>
-<dt>
 Other unix clients
 </dt>
 <dd>
@@ -424,8 +428,8 @@ with recent Python distributions.
 <address>
 Permanent URL: <kbd><a href="http://sourceforge.net/projects/eudora2unix/">http://sourceforge.net/projects/eudora2unix/</a></kbd><br />
 Page last modified on
-2002-12-09,
-by Stevan White
+2010-12-17,
+by Jonathan Abbey
 (<a href="mailto:Stevan White &lt;Stevan_White@hotmail.com&gt;">Stevan_White@hotmail.com</a>).
 </address>
 
