@@ -22,27 +22,37 @@
 <p>
 <a href="http://eudora2unix.sourceforge.net"><img src="Eudora2Unix.png" alt="Eudora2Unix Home Page" width="248" height="69" /></a>
 <a href="http://sourceforge.net"> <img src="http://sourceforge.net/sflogo.php?group_id=68238&amp;type=5" width="210" height="62" alt="SourceForge Logo" /></a>
-</p><p>
+</p>
+
+<p>
 Welcome to the Eudora to Unix (Eudora2Unix) page!
 </p>
+
 <h2>Description</h2>
+
 <p>
 Eudora2Unix is a collection of Python scripts that together convert
 <a href="http://www.eudora.com">Qualcomm Eudora</a> mail folders
-to mail directories for unix or Linux.
+to standard mailbox formats for unix or Linux.
+</p>
+
+<p>
 The mail clients <a href="http://www.washington.edu/pine/">Pine</a> and
 <a href="http://kmail.kde.org">KMail</a> are explicitly supported.  I have
 also tried the output with <a href="http://balsa.gnome.org">Balsa</a>, which
 uses a mailbox structure similar to Pine's.
 </p>
+
 <p>
-Beyond doctoring the Eudora mail messages to be in mbox format, Eudora2Unix
-preserves information that Eudora does not store in the mailbox files. 
-This information includes status info (whether a message has been read or not),
-message priority, and attachments.  For the Windows 3.x versions, it uses other
-auxiliary files to correctly rename folders and files from their 8-character
-DOS names to the names that appear in Eudora.
+Beyond doctoring the Eudora mail messages to be in mbox format,
+Eudora2Unix preserves information that Eudora does not store in the
+mailbox files.  This information includes status info (whether a
+message has been read or not), message priority, attachments, and
+embedded message components.  For the Windows 3.x versions, it uses
+other auxiliary files to correctly rename folders and files from their
+8-character DOS names to the names that appear in Eudora.
 </p>
+
 <p>
 These scripts are placed under the
 <a href="http://www.gnu.org/licenses/gpl.html">GNU General Public License</a>
@@ -50,9 +60,11 @@ and are free software, both as in freedom and as in beer.<br />
 This software is also listed at
 <a href="http://freshmeat.net/projects/eudora2unix/">Freshmeat</a>.
 </p>
+
 <p>
 <big><strong><a href="details.html">Details about Eudora2Unix</a></strong></big>.
 </p>
+
 <p>
 <big><strong><a href="http://sourceforge.net/projects/eudora2unix/">SourceForge Project Page</a></strong></big>
 (bug reports, older versions, more details, etc)
@@ -60,9 +72,10 @@ This software is also listed at
 
 <h2>Download</h2>
 <p>
-The current version requires Python 2.2.1: 
-<kbd><a href="http://prdownloads.sourceforge.net/eudora2unix/eudora2unix-1.3.tar.gz?download">eudora2unix-1.3.tar.gz</a></kbd>
+The current version requires Python 2.5 or later:
+<kbd><a href="http://prdownloads.sourceforge.net/eudora2unix/eudora2unix-2.0.tar.gz?download">eudora2unix-2.0.tar.gz</a></kbd>
 </p>
+
 <p>
 For older versions of Python (back to 1.5.2), use this separate branch
 <kbd><a href="http://prdownloads.sourceforge.net/eudora2unix/eudora2unix-backport-1.1.tar.gz?download">eudora2unix-backport-1.1.tar.gz</a></kbd>
@@ -74,18 +87,21 @@ For older versions of Python (back to 1.5.2), use this separate branch
 	<p>
 	Main script that loops over the Eudora folders and calls the next
 	script, <kbd>Eudora2Mbox.py</kbd>, for each mailbox therein.
-	It then arranges mail folders in the fashion either Pine or KMail
-	expects.
+	It then creates mailbox files / folders in any of several standard Linux/Unix formats.
 	</p>
-</li><li><p><kbd>Eudora2Mbox.py</kbd> - Eudora to unix mailbox converter</p>
+</li>
+
+<li><p><kbd>Eudora2Mbox.py</kbd> - Eudora to unix mailbox converter</p>
 	<p>
-	Converts a Eudora mailbox to unix 'mbox' format,
+	Converts a Eudora mailbox to any of several Linux/Unix mailbox formats,
 	fixing some header fields to allow for Eudora's idiosyncracies, as
 	well as those of Kmail and Pine.
 	You can also run the script directly on an individual mailbox or put
 	it in your own script that traverses the Eudora mail folder tree.
 	</p>
-</li><li><p><kbd>EudoraTOC.py</kbd> - Eudora toc file parser</p>
+</li>
+
+<li><p><kbd>EudoraTOC.py</kbd> - Eudora toc file parser</p>
 	<p>
 	Makes an educated guess as to the format of the proprietary Eudora
 	'<kbd>.toc</kbd>' files, prints out useful info as a text file. 
@@ -93,7 +109,31 @@ For older versions of Python (back to 1.5.2), use this separate branch
 	of Eudora, and drastically between the Mac and Windows versions, so
 	it is likely not to work for untested Eudora versions.
 	</p>
-</li></ul>
+</li>
+
+<li><p><kbd>Header.py</kbd> - Eudora Header parser</p>
+	<p>
+	Handles parsing and cleanup / conversion of headers from Eudora MBX files.
+	</p>
+</li>
+
+<li><p><kbd>EudoraLog.py</kbd> - Eudora2Unix Logging module</p>
+	<p>
+	Handles notice / warn / error logging for the Eudora2Unix scripts.
+	</p>
+</li>
+
+
+<li><p><kbd>EudoraHTMLParser.py</kbd> - HTML Parsing Module</p>
+	<p>
+	An HTML parser instance used to determine content identifiers
+	(cid: URLs) in HTML messages to support MIME attachment of
+	embedded images in converted emails.
+	</p>
+</li>
+
+
+</ul>
 
 <h2>Installation, configuration and usage</h2>
 
@@ -129,18 +169,21 @@ For older versions of Python (back to 1.5.2), use this separate branch
 	You may wish to copy your attachments too.  By default, this folder
 	is in the Eudora mail folder, and named '<kbd>Attachments Folder</kbd>',
 	'<kbd>attach</kbd>', or '<kbd>Attach</kbd>', depending on your Eudora
-	version.  You should rename it so as to have no spaces in the file path,
-	and make it a subfolder of the Eudora mail directory.
-	I like to hide it from the mail client by putting a dot at the
-	beginning of the filename.
+	version.
 	</p>
+
 	<p>
-	To identify the attachments forlder to  Eudora2Unix, use the option
+	To identify the attachments folder to  Eudora2Unix, use the option
 	</p>
+
 	<p>
 	<kbd>-a attachments_folder 
 	</kbd>
 	</p>
+
+	<p>If you have multiple attachments folders that you want to
+	use, you can include them with the <kbd>-a</kbd> option by
+	separating them with colons.</p>
 </li>
 <li>
 	<p>
@@ -215,7 +258,7 @@ Eudora2Unix is now maintained by Steve White:
 <hr />
 <p>
 Page last modified on
-2003-4-29
+2010-12-17
 </p>
 
 </body>
