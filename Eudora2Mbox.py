@@ -57,6 +57,11 @@ import getopt
 import urllib
 import traceback
 from HTMLParser import HTMLParseError
+import mimetypes
+
+# We require Python 2.5 or later to provide Version 4.0 of the Email
+# library
+
 from email import message, encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.nonmultipart import MIMENonMultipart
@@ -65,8 +70,7 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.message import MIMEMessage
 from email.mime.audio import MIMEAudio
-from mailbox import mbox
-import mimetypes
+from mailbox import mbox, Maildir, MMDF, MH, Babyl
 
 from Header import Replies, TOC_Info, Header, strip_linesep, re_message_start
 import EudoraLog
@@ -213,11 +217,14 @@ def convert( mbx, embedded_dir = None, opts = None ):
 
 	attachments_dirs = []
 	target = ''
+	format = None
+
 	if opts:
 		for f, v in opts:
 			if f == '-a':
 				attachments_dirs = v.split(':')
-
+			elif f == '-f':
+				format = v.strip().lower()
 			elif f == '-t':
 				target = v
 
@@ -231,11 +238,7 @@ def convert( mbx, embedded_dir = None, opts = None ):
 
 	newfile = mbx + '.new'
 
-	try:
-		newmailbox = mbox( newfile )
-	except IOError, ( errno, strerror ):
-		mailbox = None
-		return EudoraLog.fatal( P + ': cannot open "' + newfile + '", ' + strerror )
+	newmailbox = create_mailbox( newfile, format )
 
 	toc_info = TOC_Info( mbx )
 	replies = Replies( INPUT )
@@ -332,6 +335,31 @@ def convert( mbx, embedded_dir = None, opts = None ):
 			return EudoraLog.fatal( P + ': cannot close "' + mbx + '"' )
 
 	return 0
+
+def create_mailbox( mailbox_name, format=None ):
+	"""Creates and returns a Python mailbox object that can be
+	used to write mail messages into.
+
+	If format is not None, it can be one of mbox, maildir, mmdf,
+	mh, babyl, to control the type of mailbox created.
+	"""
+	
+	try:
+		if not format or format=='mbox':
+			newmailbox = mbox( newfile )
+		elif format=='maildir':
+			newmailbox = Maildir( newfile )
+		elif format=='mmdf':
+			newmailbox = MMDF( newfile )
+		elif format=='mh':
+			newmailbox = MH( newfile )
+		elif format=='babyl':
+			newmailbox = Babyl( newfile )
+	except IOError, ( errno, strerror ):
+		newmailbox = None
+		return EudoraLog.fatal( P + ': cannot open "' + newfile + '", ' + strerror )
+
+	return newmailbox
 
 def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 	"""Takes four parameters.  The first is a list of line strings

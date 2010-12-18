@@ -45,7 +45,7 @@ embedded_dir = None
 def usage_complaint( arg ):
 	return [
 	'Usage error; specify Eudora directory to be converted:',
-	'   ' + arg + ' [-a attachments directory] [-d target directory] eudora_directory [kmail|pine]'
+	'   ' + arg + ' [-a attachments directory] [-f mbox|maildir|mmdf|mh|babyl] [-d target directory] eudora_directory [kmail|pine]'
 	]
 
 def target_directory_already_exists_complaint( maildir ):
