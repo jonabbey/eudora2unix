@@ -346,18 +346,18 @@ def create_mailbox( mailbox_name, format=None ):
 	
 	try:
 		if not format or format=='mbox':
-			newmailbox = mbox( newfile )
+			newmailbox = mbox( mailbox_name )
 		elif format=='maildir':
-			newmailbox = Maildir( newfile )
+			newmailbox = Maildir( mailbox_name )
 		elif format=='mmdf':
-			newmailbox = MMDF( newfile )
+			newmailbox = MMDF( mailbox_name )
 		elif format=='mh':
-			newmailbox = MH( newfile )
+			newmailbox = MH( mailbox_name )
 		elif format=='babyl':
-			newmailbox = Babyl( newfile )
+			newmailbox = Babyl( mailbox_name )
 	except IOError, ( errno, strerror ):
 		newmailbox = None
-		return EudoraLog.fatal( P + ': cannot open "' + newfile + '", ' + strerror )
+		return EudoraLog.fatal( P + ': cannot open "' + mailbox_name + '", ' + strerror )
 
 	return newmailbox
 
