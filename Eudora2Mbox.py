@@ -609,7 +609,7 @@ def craft_message( headers, body, attachments, embeddeds, mbx, is_html):
 			if i < len(embeddeds):
 				print embeddeds[i],
 
-				if os.path.exists(edir + os.sep + embeddeds[i]):
+				if edir and os.path.exists(edir + os.sep + embeddeds[i]):
 					print " *"
 				else:
 					print " !"
@@ -914,10 +914,13 @@ def handle_embedded( cid, filename, message ):
 	global paths_found, paths_missing
 	global missing_attachments, found_attachments
 
-	realfilename = edir + os.sep + filename
+	if edir:
+		realfilename = edir + os.sep + filename
 
-	if not os.path.exists(realfilename):
-		print "Couldn't find embedded file %s" % (realfilename,)
+		if not os.path.exists(realfilename):
+			print "Couldn't find embedded file %s" % (realfilename,)
+			return
+	else:
 		return
 
 	mimeinfo = mimetypes.guess_type(realfilename)
