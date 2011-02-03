@@ -129,6 +129,7 @@ exit_code = 0	# exit code: 0 if all ok, 1 if any warnings or errors
 
 message_count = 0
 
+re_x_attachment = re.compile( r'^X-Attachments: (.*)$', re.IGNORECASE )
 re_quoted_attachment = re.compile( r'^Attachment converted: "([^"]*)"\s*$', re.IGNORECASE )
 re_attachment = re.compile( r'^Attachment converted: (.*)$', re.IGNORECASE )
 re_embedded = re.compile( r'^Embedded Content: ([^:]+):.*' )
@@ -141,6 +142,7 @@ re_boundary_contenttype = re.compile( r'boundary="([^"]+)"', re.IGNORECASE )
 re_contenttype = re.compile( r'content-type', re.IGNORECASE )
 re_xflowed = re.compile( r'</?x-flowed>')
 re_html = re.compile( r'text/html', re.IGNORECASE )
+re_normal_html = re.compile( r'</?html>', re.IGNORECASE )
 re_xhtml = re.compile( r'</?x-html>', re.IGNORECASE )
 re_pete_stuff = re.compile( r'<!x-stuff-for-pete[^>]+>' )
 re_filename_cleaner = re.compile( r'^(.*\.\S+).*$' )
@@ -402,6 +404,15 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 			elif len( line.strip() ) != 0:
 				# Message header
 				headers.add_line(line)
+
+				attachment_matcher = re_x_attachment.match( line )
+
+				if attachment_matcher:
+					files = attachment_matcher.group(1)
+					attach_list = re.split(';\s*', files)
+
+					for attachment in attach_list:
+						attachments.append( (attachment, target) )
 			else:
 				# End of message headers.
 
@@ -428,7 +439,7 @@ def extract_pieces( msg_lines, msg_offset, mbx, inner_mesg=False ):
 			# We're in the body of the text and we need to
 			# handle attachments
 
-			if not is_html and re_xhtml.search( line ):
+			if not is_html and re_xhtml.search( line ) or re_normal_html.search( line ):
 				is_html = True
 
 			if attachments_dirs and re_attachment.search( line ):
@@ -754,8 +765,15 @@ def handle_attachment( line, target, message ):
 
 	if re_quoted_attachment.match(line):
 		attachment_desc = re_quoted_attachment.sub( '\\1', line )
-	else:
+	elif re_attachment.match(line):
 		attachment_desc = re_attachment.sub( '\\1', line )
+	else:
+		# If we're dealing with attachments recorded by the
+		# X-Attachments header, line will be a single, naked
+		# attachment desc, with no Attachment Converted
+		# surroundings
+
+		attachment_desc = line
 
 	if attachment_desc.find('"') != -1:
 		print "**>>**", attachment_desc
