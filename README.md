@@ -15,7 +15,8 @@ Reliable full conversion of Eudora mailboxes to mbox format is *not*
 guaranteed.  These scripts will do a best effort attempt, but you
 should be prepared to deal with some lossage.
 
-The scripts
+The Scripts
+-----------
 
 ## Eudora2Unix.py - Eudora mail folder tree walker
         
