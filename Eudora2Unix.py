@@ -384,7 +384,7 @@ def show_attachment_stats():
 	total_attachments_listed = 0
 	total_attachments_found = 0
 	
-	attachlog = "/VOLUMES/huckabay/attachlog.txt"
+	attachlog = "attachlog.txt"
 
 	print "\nWriting attachment statistics to %s\n" % (attachlog,)
 
@@ -641,12 +641,14 @@ def get_eudora_boxname( f, nameMap, isMac ):
 	return re_mbx_sfx.sub( '\\1', f )
 
 def moveFile( src, dst ):
+	print 'Moving "%s" to "%s"' % (str, dst)
 	try:
 		os.rename( src, dst )
 	except OSError, ( errno, strerror ):
 		exit_msg( cannot_move_complaint( src, dst, strerror ) )
 
 def removeFile( filename ):
+	print 'Removing %s' % filename
 	try:
 		os.remove( filename )
 	except OSError, ( errno, strerror ):
