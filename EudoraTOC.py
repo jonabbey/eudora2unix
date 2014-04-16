@@ -302,6 +302,7 @@ def parse( infile, outfile = None ):
 		raise TOCError( "EudoraTOC: couldn't open file " + infile )
 
 	if outfile:
+		print 'Writing %s' % outfile
 		try:
 			out = open( outfile, "w" )
 		except IOError, ( errno, strerror ):
