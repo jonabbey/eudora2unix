@@ -641,7 +641,7 @@ def get_eudora_boxname( f, nameMap, isMac ):
 	return re_mbx_sfx.sub( '\\1', f )
 
 def moveFile( src, dst ):
-	print 'Moving "%s" to "%s"' % (str, dst)
+	print 'Moving "%s" to "%s"' % (src, dst)
 	try:
 		os.rename( src, dst )
 	except OSError, ( errno, strerror ):
