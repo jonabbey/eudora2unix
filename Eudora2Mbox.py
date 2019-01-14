@@ -818,6 +818,9 @@ def handle_attachment( line, target, message ):
 			if not os.path.isabs( target ):
 				filename = os.path.join( os.environ['HOME'], filename )
 
+                        # Trim NULL bytes from filenames (found in old Eudora 2.x mailboxes)
+                        filename = filename.replace(b'\x00', '')
+                        
 			if not os.path.exists(filename):
 				if name.startswith('OutboundG4:'):
 					name = name[11:]
@@ -861,7 +864,9 @@ def handle_attachment( line, target, message ):
 
 	if cleaner_match:
 		filename = cleaner_match.group(1)
-
+                # Trim any NULL bytes we might have pulled in
+                filename = filename.replace(b'\x00', '')
+                
 	mimeinfo = mimetypes.guess_type(filename)
 
 	if not os.path.exists(filename):
@@ -984,7 +989,7 @@ if sys.argv[0].find( 'Eudora2Mbox.py' ) > -1:	# i.e. if script called directly
 		if len( args ) < 1 or len( args[0].strip() ) == 0:
 			sys.exit( 1 )
 
-		convert( args[0], opts )
+		convert( args[0], opts=opts )
 	except getopt.GetoptError:
 		exit_code = 1
 	sys.exit( exit_code )
