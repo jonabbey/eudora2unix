@@ -224,7 +224,6 @@ def convert( mbx, embedded_dir = None, opts = None ):
 	if opts:
 		for f, v in opts:
 			if f == '-a':
-                                print "We have an attachment directory"
 				attachments_dirs = v.split(':')
 			elif f == '-f':
 				format = v.strip().lower()
@@ -865,6 +864,7 @@ def handle_attachment( line, target, message ):
 
 	if cleaner_match:
 		filename = cleaner_match.group(1)
+                # Trim any NULL bytes we might have pulled in
                 filename = filename.replace(b'\x00', '')
                 
 	mimeinfo = mimetypes.guess_type(filename)
@@ -989,7 +989,6 @@ if sys.argv[0].find( 'Eudora2Mbox.py' ) > -1:	# i.e. if script called directly
 		if len( args ) < 1 or len( args[0].strip() ) == 0:
 			sys.exit( 1 )
 
-                print args[0], opts
 		convert( args[0], opts=opts )
 	except getopt.GetoptError:
 		exit_code = 1
