@@ -130,21 +130,6 @@ win_entry = string.join( (
 	'26x',	# 	(all 0)
 ), '' )
 
-# Eudora toc file versions I've seen:
-# MAC_EUDORA_LITE_3 = 0x0001
-# MAC_EUDORA_LITE_131 = 0x0000 # (a Poor choice!)
-# WIN_EUDORA_LITE_1 = 0x2a00
-# WIN_EUDORA_5 = 0x0300
-
-# Just a guess: maybe Mac and Windows are distinguished thus (with 0 being Mac)
-def isMac( version ):
-	MAC = 0x00FF
-	return version & MAC or version == 0
-
-def isWin( version ):
-	WIN = 0xFF00
-	return version & WIN
-
 # Big-Endian integer conversions
 
 def toIntBig( c ):
@@ -220,8 +205,7 @@ def printMacEntry( out, entry ):
 	print >> out
 
 def printWinEntry( out, entry ):
-	( offset, length, status, priority, date, to, subject ) \
-					= unpack( win_entry, entry )
+        ( offset, length, status, priority, date, to, subject ) = unpack( win_entry, entry )
 	print >> out, "offset:   %d" % ( toIntLittle( offset ), )
 	print >> out, "length:   %d" % ( toIntLittle( length ), )
 
@@ -258,17 +242,6 @@ def printWinEntry( out, entry ):
 	print >> out, "priority: %d" % ( priority, )
 	print >> out
 
-def readVersionAndRewind( file ):
-	verbuf = file.read( 2 )
-	v = unpack( 'BB', verbuf )
-
-	file.seek( 0 )
-
-	if len( verbuf ) > 0:
-		return ( v[0] << 8 ) | v[1]
-
-	return 0
-
 class TOCError(Exception):
 	""" Problem occurred concerning a Eudora TOC file.  """
 	def __init__(self, value):
@@ -278,7 +251,7 @@ class TOCError(Exception):
 	def args(self):
 		return self.args
 
-def parse( infile, outfile = None ):
+def parse( infile, isMac, outfile ):
 	"""
 	Parse a Eudora '.toc' file, and pull out important info into  a text 
 	file '.toc.txt' 
@@ -291,10 +264,22 @@ def parse( infile, outfile = None ):
 	Mac Eudora Lite 3.x has version 0001, Windows Eudora Pro 5.o has 0030
 	As a guess, if the upper byte is nonzero, it's Windows, otherwise,
 	it's Mac.
+
+        From prior list:
+        Eudora toc file versions I've seen:
+        MAC_EUDORA_LITE_3 = 0x0001
+        MAC_EUDORA_LITE_131 = 0x0000 # (a Poor choice!)
+        WIN_EUDORA_LITE_1 = 0x2a00
+        WIN_EUDORA_5 = 0x0300
+        Windows 6.1.0.6 used 0x0000 also. It's possible that no file format identifier shows Mac vs Windows?
+
+        Note that Windows Eudora 6.1.0.6 invalidates all this theory, so we rely on the passed-in isMac variable instead.
+
 	"""
 	file = None
 	returnVal = 0
 	out = sys.stdout
+        print >> out, ('Parsing %s ...' % infile)
 
 	try:
 		file = open( infile, "rb" )
@@ -308,54 +293,49 @@ def parse( infile, outfile = None ):
 		except IOError, ( errno, strerror ):
 			raise TOCError( "EudoraTOC: couldn't open file "
 						+ outfile )
-	version = readVersionAndRewind( file )
 	
-	if isMac( version ):
+	if isMac:
 		foldersize = calcsize( mac_folder )
 		entrysize = calcsize( mac_entry )
-	elif isWin( version ):
+	else:
 		foldersize = calcsize( win_folder );
 		entrysize = calcsize( win_entry );
-	else:
-		raise TOCError( "EudoraTOC: unknown toc version: 0x%x" \
-						% version )
-	print >> out, "Expect folder and entry sizes %d %d" \
-						% ( foldersize, entrysize )
+	print >> out, "Expect sizes: folder %d %x, entry %d %x" % ( foldersize, foldersize, entrysize, entrysize )
+        file.read(18)
+        '''
 	folder = file.read( foldersize )
 
 	if len( folder ) == 0:
 		raise TOCError( "EudoraTOC: couldn't read header" )
 
-	if isMac( version ):
+	if isMac:
 		printMacFolder( out, folder )
-	elif isWin( version ):
+	else:
 		printWinFolder( out, folder )
-
+'''
 	while True:
 		entry = file.read( entrysize )
 
 		if len( entry ) <= 0:
 			break
 
-		if isMac( version ):
-			printMacEntry( out, entry )
-		elif isWin( version ):
-			printWinEntry( out, entry )
+                try:
+                    if isMac:
+                            printMacEntry( out, entry )
+                    else:
+                            printWinEntry( out, entry )
+                except:
+                    sys.stderr.write('Error parsing %s - corrupt?\n' % infile)
+
 
 	if file:
 		file.close()
 
 	return returnVal
 
-if sys.argv[0].find( 'EudoraTOC.py' ) > -1:	# i.e. if script called directly
-	if len( sys.argv ) < 2:
-		raise TOCError( "EudoraTOC: insufficient arguments" )
-	if len( sys.argv ) >= 3:
-		outfile = sys.argv[2]
-	else:
-		outfile = None
+if __name__ == '__main__': # i.e. if script called directly
 	try:
-		sys.exit( parse( sys.argv[1], outfile ) )
+		sys.exit( parse( sys.argv[1], int(sys.argv[2]), sys.argv[3] ) )
 	except TOCError, errstr:
 		print errstr
 		sys.exit( 1 )

@@ -589,7 +589,7 @@ def convert_files( avoid_dirlist, dir, names ):
 #					os.spawnlpe( os.P_WAIT, 'etoc', 'etoc',
 #						f_toc, f_toc + '.txt',
 #						os.environ )
-					EudoraTOC.parse( f_toc, f_toc + '.txt' )
+					EudoraTOC.parse( f_toc, isMac, f_toc + '.txt' )
 				except OSError, ( errno, str ):
 					complain( toc_complaint( f_toc, str ) )
 			moveFile( fpath, f_nombx )
@@ -704,7 +704,7 @@ def fix_file_permissions( arg, dir, names ):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('source_directory', help='Eudora directory to be converted')
-    parser.add_argument('-a', metavar='attach_dir', help='attachments directory')
+    parser.add_argument('-a', required=True, metavar='attach_dir', help='attachments directory')
     parser.add_argument('-f', help='mailbox format', type=str, choices=('mbox','maildir','mmdf','mh','babyl'))
     parser.add_argument('-d', metavar='target_dir', help='target directory')
     parser.add_argument('-t', help='target client', type=str, choices=('kmail', 'pine'))
