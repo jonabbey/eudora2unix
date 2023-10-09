@@ -15,7 +15,7 @@ import os
 from os.path import *
 import re
 import string
-import getopt
+import argparse
 
 if sys.hexversion < 33686000:
 	sys.stderr.write( "Aborted: Python version must be at least 2.2.1" \
@@ -42,12 +42,6 @@ attachments_handled_by = {}
 embedded_dir = None
 
 # --------------------- Comments & complaints ----------------------
-def usage_complaint( arg ):
-	return [
-	'Usage error; specify Eudora directory to be converted:',
-	'   ' + arg + ' [-a attachments directory] [-f mbox|maildir|mmdf|mh|babyl] [-d target directory] eudora_directory [kmail|pine]'
-	]
-
 def target_directory_already_exists_complaint( maildir ):
 	return [
 	'Directory ' + maildir + ' already exits.  Rename it, e.g. to ',
@@ -595,7 +589,7 @@ def convert_files( avoid_dirlist, dir, names ):
 #					os.spawnlpe( os.P_WAIT, 'etoc', 'etoc',
 #						f_toc, f_toc + '.txt',
 #						os.environ )
-					EudoraTOC.parse( f_toc, f_toc + '.txt' )
+					EudoraTOC.parse( f_toc, isMac, f_toc + '.txt' )
 				except OSError, ( errno, str ):
 					complain( toc_complaint( f_toc, str ) )
 			moveFile( fpath, f_nombx )
@@ -707,18 +701,15 @@ def fix_file_permissions( arg, dir, names ):
 		elif isdir( f ):
 			os.chmod( fpath, 0700 )
 
-# --------------------- START HERE --------------------------------
-# Note: in this rather stupid implementation of getopts, has to go
-# program flags args, or else
-try:
-	opts, args = getopt.getopt( sys.argv[1:], 'a:d:t:' )
-except getopt.GetoptError:
-	complain( usage_complaint( sys.argv[0] ) )
-	sys.exit( 1 )
-
-if len( args ) < 1 or len( args[0].strip() ) == 0:
-	complain( usage_complaint( sys.argv[0] ) )
-	sys.exit( 1 )
-else:
-	eudoradir = args[0].strip()
-	convert_directory( eudoradir, opts )
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('source_directory', help='Eudora directory to be converted')
+    parser.add_argument('-a', required=True, metavar='attach_dir', help='attachments directory')
+    parser.add_argument('-f', help='mailbox format', type=str, choices=('mbox','maildir','mmdf','mh','babyl'))
+    parser.add_argument('-d', metavar='target_dir', help='target directory')
+    parser.add_argument('-t', help='target client', type=str, choices=('kmail', 'pine'))
+    command_line_args = parser.parse_args()
+    eudoradir = command_line_args.source_directory
+    del command_line_args.source_directory
+    opts = [ ('-'+k, v) for k,v in vars(command_line_args).items() if v != None] # hack to convert to a getopts-style list
+    convert_directory( eudoradir, opts )
